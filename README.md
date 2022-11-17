@@ -13,8 +13,7 @@ and will gradually improve other types in the future.)
 At present, I have expanded Unity's original Volume, you can use it directly, 
 or use "**MAO Timeline Playable Wizard**" to quickly expand.
 
-![](https://pic.youngmoe.com/1668615367_202211170016670/63750cc7f183a.png)
-![](https://pic.youngmoe.com/1668615451_202211170017539/63750d1b6791c.png)
+![](https://pic.youngmoe.com/1668700075_202211172347274/637657ab5d00f.gif)
 
 ## Features
 ### Now tested parameters that work fine:

@@ -8,9 +8,7 @@
 在这个repo里，我扩展了一些Unity原有的后处理Volume，可以直接导入项目使用,<br>
 也可以通过”**MAO Timeline Playable Wizard**”这个工具来自行扩展。
 
-![](https://pic.youngmoe.com/1668615367_202211170016670/63750cc7f183a.png)
-
-![](https://pic.youngmoe.com/1668615451_202211170017539/63750d1b6791c.png)
+![](https://pic.youngmoe.com/1668700075_202211172347274/637657ab5d00f.gif)
 
 ## Features
 
