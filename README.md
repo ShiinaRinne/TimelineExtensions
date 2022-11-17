@@ -3,7 +3,8 @@
 ## Introduction
 
 Some extensions for Unity Timeline. 
-You can edit properties in the Timeline more easily **without writing code**
+You can edit properties in the Timeline more easily **without writing code**,<br> 
+or help you quickly develop prototypes.
 
 [//]: # (This project was originally developed mainly to expand the post-processing volume, 
 and will gradually improve other types in the future.)
@@ -37,6 +38,7 @@ when the **mixing weight > 0.5**, it becomes the value of the next Clip, usually
 - `CubemapParameter`
 - `ObjectParameter`
 - `AnimationCurveParameter`
+- `TextureCurveParameter`
 
 
 
@@ -110,9 +112,10 @@ You can find it in `Assets/TimelineExtensions`
 
 
 ## TODO
-- [ ] Add attributes like `[Range()]`, `[Min()]`, `[Max()]` to the properties of the Clip
-- [ ] Optimize attribute adding method in "MAO Timeline Playable Wizard"
-- [ ] Add support for more parameters
+- [ ] Add attributes like `[Range()]`, `[Min()]`, `[Max()]` to the properties of the Clip.
+- [ ] Optimize attribute adding method in "MAO Timeline Playable Wizard".
+- [ ] Add support for more parameters.
+- [ ] Support high-level settings such as `Blend Curves`, `Easing-in and Easing-out`.
 
 ## License
 [MIT License](https://github.com/ShiinaRinne/TimelineExtensions/blob/master/LICENSE)

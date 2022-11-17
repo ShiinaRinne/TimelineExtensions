@@ -8,20 +8,21 @@ using UnityEngine.Timeline;
 using UnityEngine.Playables;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
+
 [Serializable]
 public class MAOBloomClip : PlayableAsset, ITimelineClipAsset
 {
-    public float threshold = 0.12f;
-    public float intensity = 0f;
-    public float scatter = 0.443f;
-    public float clamp = 65472f;
+    [Min(0f)] public float threshold = 0.9f;
+    [Min(0f)] public float intensity = 0f;
+    [Range(0f, 1f)] public float scatter = 0.7f;
+    [Min(0f)] public float clamp = 65472f;
     public Color tint = new Color(0f, 0f, 0f, 1f);
     public bool highQualityFiltering = false;
-    public int skipIterations = 1;
+    [Range(0, 16)] public int skipIterations = 1;
     public Texture dirtTexture;
-    public float dirtIntensity = 0f;
+    [Min(0f)] public float dirtIntensity = 0f;
 
-    
+
     public ClipCaps clipCaps
     {
         get { return ClipCaps.Blending; }
@@ -42,7 +43,7 @@ public class MAOBloomClip : PlayableAsset, ITimelineClipAsset
         behaviour.DirtTexture = dirtTexture;
         behaviour.DirtIntensity = dirtIntensity;
 
-        
+
         return playable;
     }
 }

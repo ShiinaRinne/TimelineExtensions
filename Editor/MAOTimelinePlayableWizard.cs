@@ -298,11 +298,11 @@ namespace YMToonURP.Timeline.Editor
                     type = "string";
                 else if (fieldInfo.FieldType.Name == "Color" || fieldInfo.FieldType.Name.Contains("ColorParameter"))
                     type = "Color";
-                else if (fieldInfo.FieldType.Name == "Vector2")
+                else if (fieldInfo.FieldType.Name == "Vector2" || fieldInfo.FieldType.Name.Contains("Vector2Parameter"))
                     type = "Vector2";
-                else if (fieldInfo.FieldType.Name == "Vector3")
+                else if (fieldInfo.FieldType.Name == "Vector3" || fieldInfo.FieldType.Name.Contains("Vector3Parameter"))
                     type = "Vector3";
-                else if (fieldInfo.FieldType.Name == "Vector4")
+                else if (fieldInfo.FieldType.Name == "Vector4" || fieldInfo.FieldType.Name.Contains("Vector4Parameter"))
                     type = "Vector4";
                 // TODO: Check Texture、Texture2D、Texture3D
                 else if (fieldInfo.FieldType.Name == "Texture" || fieldInfo.FieldType.Name.Contains("TextureParameter"))
@@ -583,7 +583,7 @@ namespace YMToonURP.Timeline.Editor
 
         public static UsableType trackBinding;
         public Component defaultValuesComponent;
-        public VolumeComponent defaultValuesVolumeComponent;
+        // public VolumeComponent defaultValuesVolumeComponent;
         public Volume defaultValuesVolume;
         public List<Variable> exposedReferences = new List<Variable>();
         public List<Variable> playableBehaviourVariables = new List<Variable>();
@@ -1163,7 +1163,7 @@ namespace YMToonURP.Timeline.Editor
 
             if (GUILayout.Button("Add", GUILayout.Width(40f)))
             {
-                postProcessVolumeProperties.Add(m_TrackBindingUsableProperties[1].GetDuplicate());
+                postProcessVolumeProperties.Add(m_TrackBindingUsableProperties[0].GetDuplicate());
             }
 
             if (postProcessVolumeProperties.Any(IsObsolete))
@@ -1400,7 +1400,7 @@ namespace YMToonURP.Timeline.Editor
             trackBinding = s_TrackBindingTypes[0];
             defaultValuesComponent = null;
             defaultValuesVolume = null;
-            defaultValuesVolumeComponent = null;
+            // defaultValuesVolumeComponent = null;
             exposedReferences = new List<Variable>();
             playableBehaviourVariables = new List<Variable>();
             standardBlendPlayableProperties = new List<UsableProperty>();
