@@ -220,19 +220,39 @@ public class {playableName}{k_TrackAssetSuffix} : TrackAsset
 ";
         }
 
+        string VolumeBlendScriptPlayablePropertiesGetPropertyAttributes(UsableProperty prop)
+        {
+            var isFloat = prop.type == "float"?"f":"";
+            if (prop.propertyAttributesType == UsableProperty.PropertyAttributesType.MinMax)
+            {
+                return $"[Range({prop.min}{isFloat}, {prop.max}{isFloat})] ";
+            }
+            if(prop.propertyAttributesType == UsableProperty.PropertyAttributesType.Min)
+            {
+                return $"[Min({prop.min}{isFloat})] ";
+            }
+            if (prop.propertyAttributesType == UsableProperty.PropertyAttributesType.Max)
+            {
+                return $"[Max({prop.max}{isFloat})] ";
+            }
+
+            return "";
+        }
+
         string VolumeBlendScriptPlayablePropertiesToStringWithDefaultValue()
         {
             string returnVal = "";
             for (int i = 0; i < postProcessVolumeProperties.Count; i++)
             {
                 UsableProperty prop = postProcessVolumeProperties[i];
+                string attributes = VolumeBlendScriptPlayablePropertiesGetPropertyAttributes(prop);
                 if (prop.defaultValue == "")
                 {
-                    returnVal += $"    public {prop.type} {prop.name};\r\n";
+                    returnVal += $"    {attributes}public {prop.type} {prop.name};\r\n";
                 }
                 else
                 {
-                    returnVal += $"    public {prop.type} {prop.name} = {prop.defaultValue};\r\n";
+                    returnVal += $"    {attributes}public {prop.type} {prop.name} = {prop.defaultValue};\r\n";
                 }
             }
 

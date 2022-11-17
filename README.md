@@ -67,10 +67,6 @@ when the **mixing weight > 0.5**, it becomes the value of the next Clip, usually
 4. Set TrackBinding to the Volume you need. (**Very important**, after binding, the newly created Clip will get
    the parameters in the Volume as default values).
 5. Add a new Clip to the Track, edit properties in the Clip or mix with other Clips.<br>
-   
-
->Since I have not yet implemented the way to obtain the original "Property Attributes", <br>
-**directly modified the value in Clip may exceed the scope of the Volume**
 
 
 ### Wizard Usage
@@ -107,13 +103,12 @@ You can find it in `Assets/TimelineExtensions`
 </details>
 
 
-**At times, you may still need to make changes to the generated script(For example, add the Attribute).**<br>
-**And if you have any problems during use, please report an issue.**
+**If you have any problems during use, please report an issue.**
 
 
 
 ## TODO
-- [ ] Add attributes like `[Range()]`, `[Min()]`, `[Max()]` to the properties of the Clip.
+- [x] Add attributes like `[Range()]`, `[Min()]`, `[Max()]` to the properties of the Clip.
 - [ ] Optimize attribute adding method in "MAO Timeline Playable Wizard".
 - [ ] Add support for more parameters.
 - [ ] Support high-level settings such as `Blend Curves`, `Easing-in and Easing-out`.

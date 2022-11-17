@@ -49,12 +49,6 @@
 4. 将你创建的Volume绑定到这个Track上
 5. 在Track中添加新的Clip，编辑属性，或者与其他的Clip进行混合即可
 
-> 目前我还没有实现获取原始的`Property Attributes`的功能，所以直接修改Clip中的值，
-> 可能会超出VolumeComponent中限制的范围，
->
->你可能需要在生成的Clip的基础上，自己添加例如`Range(), Min(), Max()`之类的属性
->
-
 ### Wizard Usage
 
 这是一个可以帮你快速生成Timeline扩展的工具
@@ -81,14 +75,12 @@
 
 5. 最后点 `Create`就可以了，等编译完之后就可以使用，你可以在 `Assets/TimelineExtensions`找到生成的脚本
 
-> 为了更好用，你可能仍然需要自己对生成的脚本做一些修改，例如在字段前添加 `Range()、Min()、Max()`等属性
->
 > 使用过程中有任何问题，都可以在Github发个issue~
 >
 
 ## TODO
 
-- [ ]  在生成时，自动获取`[Range()]`,`[Min()]`,`[Max()]`这些属性
+- [x]  在生成时，自动获取`[Range()]`,`[Min()]`,`[Max()]`这些属性
 - [ ]  优化添加属性时候的操作
 - [ ]  添加对更多类型参数的支持
 - [ ]  支持一些高级设置，例如`Blend Curves`,`Easing-in and Easing-out`.
