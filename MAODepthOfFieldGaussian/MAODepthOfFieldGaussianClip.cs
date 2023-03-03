@@ -8,15 +8,16 @@ using UnityEngine.Timeline;
 using UnityEngine.Playables;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
+
 [Serializable]
 public class MAODepthOfFieldGaussianClip : PlayableAsset, ITimelineClipAsset
 {
-    public float gaussianStart = 10f;
-    public float gaussianEnd = 30f;
-    public float gaussianMaxRadius = 1f;
+    [Min(0f)] public float gaussianStart = 10f;
+    [Min(0f)] public float gaussianEnd = 30f;
+    [Range(0.5f, 1.5f)] public float gaussianMaxRadius = 1f;
     public bool highQualitySampling = false;
 
-    
+
     public ClipCaps clipCaps
     {
         get { return ClipCaps.Blending; }
@@ -32,7 +33,7 @@ public class MAODepthOfFieldGaussianClip : PlayableAsset, ITimelineClipAsset
         behaviour.GaussianMaxRadius = gaussianMaxRadius;
         behaviour.HighQualitySampling = highQualitySampling;
 
-        
+
         return playable;
     }
 }

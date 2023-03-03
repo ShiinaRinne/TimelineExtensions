@@ -8,17 +8,18 @@ using UnityEngine.Timeline;
 using UnityEngine.Playables;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
+
 [Serializable]
 public class MAODepthOfFieldBokehClip : PlayableAsset, ITimelineClipAsset
 {
-    public float focusDistance = 0.1f;
-    public float aperture = 5.6f;
-    public float focalLength = 5.6f;
-    public int bladeCount = 5;
-    public float bladeCurvature = 1f;
-    public float bladeRotation = 0f;
+    [Min(0.1f)] public float focusDistance = 10f;
+    [Range(1f, 32f)] public float aperture = 5.6f;
+    [Range(1f, 300f)] public float focalLength = 50f;
+    [Range(3, 9)] public int bladeCount = 5;
+    [Range(0f, 1f)] public float bladeCurvature = 1f;
+    [Range(-180f, 180f)] public float bladeRotation = 0f;
 
-    
+
     public ClipCaps clipCaps
     {
         get { return ClipCaps.Blending; }
@@ -36,7 +37,7 @@ public class MAODepthOfFieldBokehClip : PlayableAsset, ITimelineClipAsset
         behaviour.BladeCurvature = bladeCurvature;
         behaviour.BladeRotation = bladeRotation;
 
-        
+
         return playable;
     }
 }

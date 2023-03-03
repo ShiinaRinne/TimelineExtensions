@@ -212,6 +212,22 @@ namespace YMToonURP.Timeline.Editor
                 Property,
                 Field
             }
+            
+            /// ================================
+            /// for PropertyAttribute
+            public enum PropertyAttributesType
+            {
+                MinMax,
+                Min,
+                Max,
+                Null
+            }
+
+            public PropertyAttributesType propertyAttributesType = PropertyAttributesType.Null;
+            public float min;
+            public float max;
+            // =================================
+            
 
             public string type;
             public string name;
@@ -298,11 +314,11 @@ namespace YMToonURP.Timeline.Editor
                     type = "string";
                 else if (fieldInfo.FieldType.Name == "Color" || fieldInfo.FieldType.Name.Contains("ColorParameter"))
                     type = "Color";
-                else if (fieldInfo.FieldType.Name == "Vector2")
+                else if (fieldInfo.FieldType.Name == "Vector2" || fieldInfo.FieldType.Name.Contains("Vector2Parameter"))
                     type = "Vector2";
-                else if (fieldInfo.FieldType.Name == "Vector3")
+                else if (fieldInfo.FieldType.Name == "Vector3" || fieldInfo.FieldType.Name.Contains("Vector3Parameter"))
                     type = "Vector3";
-                else if (fieldInfo.FieldType.Name == "Vector4")
+                else if (fieldInfo.FieldType.Name == "Vector4" || fieldInfo.FieldType.Name.Contains("Vector4Parameter"))
                     type = "Vector4";
                 // TODO: Check Texture、Texture2D、Texture3D
                 else if (fieldInfo.FieldType.Name == "Texture" || fieldInfo.FieldType.Name.Contains("TextureParameter"))
@@ -424,7 +440,44 @@ namespace YMToonURP.Timeline.Editor
                 }
             }
 
-            public void CreateSettingDefaultValueStringVolume<T>(Volume defaultValuesComponent, string paramType)
+            
+            /// <summary>
+            /// 获取字段的Range，Min，Max属性
+            /// </summary>
+            /// <typeparam name="T">T: ClampedFloat, RangeInt, MinFloat, etc</typeparam>
+            public void GetPropertyAttributes<T>(object parameter) where T : VolumeParameter
+            {
+                var typeName = typeof(T).Name;
+                if(typeName.Contains("Range") || typeName.Contains("Clamped"))
+                {
+                    propertyAttributesType = PropertyAttributesType.MinMax;
+                    min = (float)GetPropertyAttributesMin(parameter);
+                    max = (float)GetPropertyAttributesMax(parameter);
+                    
+                }
+                else if (typeName.Contains("Min"))
+                {
+                    propertyAttributesType = PropertyAttributesType.Min;
+                    min = (float)GetPropertyAttributesMin(parameter);
+                }
+                else if (typeof(T).Name.Contains("Max"))
+                {
+                    propertyAttributesType = PropertyAttributesType.Max;
+                    max = (float)GetPropertyAttributesMax(parameter);
+                }
+            }
+            
+            public object GetPropertyAttributesMax(object parameter)
+            {
+                return parameter.GetType().GetField("max").GetValue(parameter);
+            }
+            public object GetPropertyAttributesMin(object parameter)
+            {
+                return parameter.GetType().GetField("min").GetValue(parameter);
+            }
+
+
+            public void CreateSettingDefaultValueStringVolume<T>(Volume defaultValuesComponent, UsableProperty prop)
                 where T : VolumeComponent
             {
                 // var component = (T)FormatterServices.GetUninitializedObject(typeof(T));
@@ -434,13 +487,13 @@ namespace YMToonURP.Timeline.Editor
                     defaultValue = "";
                     return;
                 }
-
                 var parameter = usablePropertyType == UsablePropertyType.Property
                     ? propertyInfo.GetValue(component, null)
                     : fieldInfo.GetValue(component);
 
+                
                 var method = typeof(VolumeParameter).GetMethod("GetValue");
-                switch (paramType)
+                switch (prop.type)
                 {
                     case "float":
                         float defaultFloatValue =
@@ -498,6 +551,15 @@ namespace YMToonURP.Timeline.Editor
                         string enumConstantName = Enum.GetName(enumSystemType, defaultEnumValue);
                         defaultValue = enumType + "." + enumConstantName;
                         break;
+                }
+                
+                try
+                {
+                    typeof(UsableProperty).GetMethod("GetPropertyAttributes")
+                        .MakeGenericMethod(parameter.GetType()).Invoke(prop, new object[] {parameter});
+                }catch (Exception e)
+                {
+                    Debug.Log(e + " " + parameter.GetType() + " " + prop.type + " "+ prop.name);
                 }
             }
 
@@ -583,7 +645,7 @@ namespace YMToonURP.Timeline.Editor
 
         public static UsableType trackBinding;
         public Component defaultValuesComponent;
-        public VolumeComponent defaultValuesVolumeComponent;
+        // public VolumeComponent defaultValuesVolumeComponent;
         public Volume defaultValuesVolume;
         public List<Variable> exposedReferences = new List<Variable>();
         public List<Variable> playableBehaviourVariables = new List<Variable>();
@@ -979,7 +1041,7 @@ namespace YMToonURP.Timeline.Editor
 
                         foreach (var prop in postProcessVolumeProperties)
                         {
-                            genericMethod.Invoke(prop, new object[] {defaultValuesVolume, prop.type});
+                            genericMethod.Invoke(prop, new object[] {defaultValuesVolume, prop});
                         }
                     }
 
@@ -1163,7 +1225,7 @@ namespace YMToonURP.Timeline.Editor
 
             if (GUILayout.Button("Add", GUILayout.Width(40f)))
             {
-                postProcessVolumeProperties.Add(m_TrackBindingUsableProperties[1].GetDuplicate());
+                postProcessVolumeProperties.Add(m_TrackBindingUsableProperties[0].GetDuplicate());
             }
 
             if (postProcessVolumeProperties.Any(IsObsolete))
@@ -1400,7 +1462,7 @@ namespace YMToonURP.Timeline.Editor
             trackBinding = s_TrackBindingTypes[0];
             defaultValuesComponent = null;
             defaultValuesVolume = null;
-            defaultValuesVolumeComponent = null;
+            // defaultValuesVolumeComponent = null;
             exposedReferences = new List<Variable>();
             playableBehaviourVariables = new List<Variable>();
             standardBlendPlayableProperties = new List<UsableProperty>();
