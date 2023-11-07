@@ -236,6 +236,11 @@ public class {playableName}{k_TrackAssetSuffix} : TrackAsset
                 return $"[Max({prop.max}{isFloat})] ";
             }
 
+            if (prop.propertyAttributesType == UsableProperty.PropertyAttributesType.ColorHDR)
+            {
+                return $"[ColorUsage(true, true)] ";
+            }
+
             return "";
         }
 
@@ -383,7 +388,8 @@ using UnityEngine;
 using UnityEngine.Timeline;
 using UnityEngine.Playables;
 using UnityEngine.Rendering;
-using UnityEngine.Rendering.Universal;";
+using UnityEngine.Rendering.Universal;
+" + AdditionalNamespacesToString();
         }
 
         string TrackBindingToString()

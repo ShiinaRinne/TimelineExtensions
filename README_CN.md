@@ -8,11 +8,11 @@
 在这个repo里，我扩展了一些Unity原有的后处理Volume，可以直接导入项目使用,<br>
 也可以通过”**MAO Timeline Playable Wizard**”这个工具来自行扩展。
 
-![](https://pic.youngmoe.com/1668700075_202211172347274/637657ab5d00f.gif)
+![](https://r2.youngmoe.com/ym-r2-bucket/2023/11/fb552984c57c7f0d554303d97d4387c6.gif)
 
 ## Features
 
-### 目前在Volume中支持的、可用的参数：
+### 目前在Volume模式中支持的、可用的参数：
 
 - `FloatParameter`
 - `IntParameter`
@@ -24,7 +24,7 @@
 - `TextureParameter`
 
 > `BoolParameter`和`TextureParameter` 可能没什么用处，是我闲的没事硬加上去的，
-> 混合方式为：当Clip的混合权重>0.5时，会变为下一个Clip的值，一般来说不必管它~
+> 混合方式为：当Clip的混合权重>0.5时，会变为下一个Clip的值，一般来说不用管~
 
 ### 目前不支持或没有经过完全测试的：
 
@@ -49,9 +49,9 @@
 
 ### Wizard Usage
 
-这是一个可以帮你快速生成Timeline扩展的工具
+这是一个可以快速生成Timeline扩展的工具
 
-它可以直接获取当前AppDomain下的所有类，并通过C#反射来获取需要的字段，这样你就不再需要自己写扩展了~
+它可以直接获取当前AppDomain下的所有类，并通过C#反射来获取需要的字段，这样就不再需要自己写扩展了~
 
 > 现在仅支持 `VolumeComponent`，`Component`模式尚未开发完成
 >
@@ -61,19 +61,19 @@
 1. 在 `Window/MAO Timeline Playable Wizard`打开
 2. 切换 `WorkType`为 `VolumeComponent`，选择需要的 `Track Binding Type`
 
-   ![](https://pic.youngmoe.com/1668613341_202211162342576/637504dd561ec.png)
+   ![](https://r2.youngmoe.com/ym-r2-bucket/2023/11/19e8b6032028290d224b7fadef049284.png)
 
 3. 将Default Values设置为Volume
 
-   ![](https://pic.youngmoe.com/1668614619_202211170003969/637509dbbd789.png)
+   ![](https://r2.youngmoe.com/ym-r2-bucket/2023/11/7a228f2972434178c205c8aaf67a6b0b.png)
 
 4. 添加属性
 
-   ![](https://pic.youngmoe.com/1668613472_202211162344770/63750560bcd75.png)
+   ![](https://r2.youngmoe.com/ym-r2-bucket/2023/11/14b3980e06f8d6cb0b87f9e74eb025e4.png)
 
 5. 最后点 `Create`就可以了，等编译完之后就可以使用，你可以在 `Assets/TimelineExtensions`找到生成的脚本
 
-> 使用过程中有任何问题，都可以在Github发个issue~
+> 使用过程中有任何问题请发issue~
 >
 
 ## TODO
@@ -93,5 +93,7 @@
 
 
 [//]: # (## 彩蛋)
-
 [//]: # (我不是在给爱莉生日做视频吗！为什么最后做了这个东西出来！我的爱莉呢！！！)
+
+[//]: # (## 彩蛋2)
+[//]: # (一年过去了，爱莉还是没有来到我身边QAQ)

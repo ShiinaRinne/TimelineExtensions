@@ -17,7 +17,12 @@ public class MAOBloomMixerBehaviour : PlayableBehaviour
     float m_DefaultClamp;
     Color m_DefaultTint;
     bool m_DefaultHighQualityFiltering;
+#if UNITY_2023_1_OR_NEWER
+    int m_DefaultMaxIterations;
+#else
     int m_DefaultSkipIterations;
+#endif
+    
     Texture m_DefaultDirtTexture;
     float m_DefaultDirtIntensity;
 
@@ -38,7 +43,11 @@ public class MAOBloomMixerBehaviour : PlayableBehaviour
             m_DefaultClamp = m_TrackBinding.clamp.value;
             m_DefaultTint = m_TrackBinding.tint.value;
             m_DefaultHighQualityFiltering = m_TrackBinding.highQualityFiltering.value;
+#if UNITY_2023_1_OR_NEWER
+            m_DefaultMaxIterations = m_TrackBinding.maxIterations.value;
+#else
             m_DefaultSkipIterations = m_TrackBinding.skipIterations.value;
+#endif
             m_DefaultDirtTexture = m_TrackBinding.dirtTexture.value;
             m_DefaultDirtIntensity = m_TrackBinding.dirtIntensity.value;
 
@@ -53,7 +62,11 @@ public class MAOBloomMixerBehaviour : PlayableBehaviour
         float blendedClamp = 0f;
         Color blendedTint = Color.clear;
         bool blendedHighQualityFiltering = false;
+#if UNITY_2023_1_OR_NEWER
+        float blendedMaxIterations = 0;
+#else
         float blendedSkipIterations = 0;
+#endif
         Texture blendedDirtTexture = new Texture2D(1,1);
         float blendedDirtIntensity = 0f;
 
@@ -73,7 +86,12 @@ public class MAOBloomMixerBehaviour : PlayableBehaviour
             blendedClamp += input.Clamp * inputWeight;
             blendedTint += input.Tint * inputWeight;
             blendedHighQualityFiltering = inputWeight > 0.5 ? input.HighQualityFiltering : blendedHighQualityFiltering;
+#if UNITY_2023_1_OR_NEWER
+            blendedMaxIterations += input.MaxIterations * inputWeight;
+#else
             blendedSkipIterations += input.SkipIterations * inputWeight;
+#endif
+            
             blendedDirtTexture = inputWeight > 0.5 ? input.DirtTexture : blendedDirtTexture;
             blendedDirtIntensity += input.DirtIntensity * inputWeight;
 
@@ -93,7 +111,12 @@ public class MAOBloomMixerBehaviour : PlayableBehaviour
         m_TrackBinding.clamp.value = blendedClamp + m_DefaultClamp * (1f-totalWeight);
         m_TrackBinding.tint.value = blendedTint + m_DefaultTint * (1f-totalWeight);
         m_TrackBinding.highQualityFiltering.value = blendedHighQualityFiltering;
+#if UNITY_2023_1_OR_NEWER
+        m_TrackBinding.maxIterations.value = Mathf.RoundToInt(blendedMaxIterations + m_DefaultMaxIterations * (1f-totalWeight));
+#else
         m_TrackBinding.skipIterations.value = Mathf.RoundToInt(blendedSkipIterations + m_DefaultSkipIterations * (1f-totalWeight));
+#endif
+        
         m_TrackBinding.dirtTexture.value = blendedDirtTexture;
         m_TrackBinding.dirtIntensity.value = blendedDirtIntensity + m_DefaultDirtIntensity * (1f-totalWeight);
 
@@ -114,7 +137,12 @@ public class MAOBloomMixerBehaviour : PlayableBehaviour
         m_TrackBinding.clamp.value = m_DefaultClamp;
         m_TrackBinding.tint.value = m_DefaultTint;
         m_TrackBinding.highQualityFiltering.value = m_DefaultHighQualityFiltering;
+#if UNITY_2023_1_OR_NEWER
+        m_TrackBinding.maxIterations.value = m_DefaultMaxIterations;
+#else
         m_TrackBinding.skipIterations.value = m_DefaultSkipIterations;
+#endif
+        
         m_TrackBinding.dirtTexture.value = m_DefaultDirtTexture;
         m_TrackBinding.dirtIntensity.value = m_DefaultDirtIntensity;
 

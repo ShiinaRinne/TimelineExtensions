@@ -1,5 +1,5 @@
 ﻿# TimelineExtensions
-English | [简体中文](README_CN.md)
+English | [中文](README_CN.md)
 
 ## Introduction
 
@@ -13,10 +13,10 @@ and will gradually improve other types in the future.)
 At present, I have expanded Unity's original Volume, you can use it directly, 
 or use "**MAO Timeline Playable Wizard**" to quickly expand.
 
-![](https://pic.youngmoe.com/1668700075_202211172347274/637657ab5d00f.gif)
+![](https://r2.youngmoe.com/ym-r2-bucket/2023/11/fb552984c57c7f0d554303d97d4387c6.gif)
 
 ## Features
-### Now tested parameters that work fine:
+### Now tested parameters that work fine in Volume Mode:
 - `FloatParameter`
 - `IntParameter`
 - `BoolParameter`
@@ -78,27 +78,23 @@ You no longer need to fill in manually.
 #### VolumeComponent:
 1. You can find it in the menu bar `Window/MAO Timeline Playable Wizard`
 
-2. Switch `WorkType` to VolumeComponent, select the VolumeComponent
+2. Switch `WorkType` to VolumeComponent, select the `Track Binding Type`
 
-   ![](https://pic.youngmoe.com/1668613341_202211162342576/637504dd561ec.png)
+   ![](https://r2.youngmoe.com/ym-r2-bucket/2023/11/19e8b6032028290d224b7fadef049284.png)
 
 3. Set `Default Values` to the Volume
 
-   ![](https://pic.youngmoe.com/1668614619_202211170003969/637509dbbd789.png)
+   ![](https://r2.youngmoe.com/ym-r2-bucket/2023/11/7a228f2972434178c205c8aaf67a6b0b.png)
 
 4. Add the properties
 
-   ![](https://pic.youngmoe.com/1668613472_202211162344770/63750560bcd75.png)
+   ![](https://r2.youngmoe.com/ym-r2-bucket/2023/11/14b3980e06f8d6cb0b87f9e74eb025e4.png)
 
 5. Finally, click `Create`, wait for the compilation to complete and start enjoying~<br>
 You can find it in `Assets/TimelineExtensions`
 
 <details>
 <summary>The Enum type is currently not supported. When you need it (such as Gaussian or Boken's DOF), it is recommended to create it in the following way</summary>
-
-![](https://pic.youngmoe.com/1668615739_202211170022942/63750e3bb10b2.png)
-
-![](https://pic.youngmoe.com/1668615893_202211170024445/63750ed564189.png)
 </details>
 
 

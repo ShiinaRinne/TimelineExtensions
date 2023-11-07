@@ -17,7 +17,12 @@ public class MAOBloomBehaviour : PlayableBehaviour
     public float Clamp;
     public Color Tint;
     public bool HighQualityFiltering;
+#if UNITY_2023_1_OR_NEWER
+    public int MaxIterations;
+#else
     public int SkipIterations;
+#endif
+    
     public Texture DirtTexture;
     public float DirtIntensity;
 

@@ -220,6 +220,7 @@ namespace YMToonURP.Timeline.Editor
                 MinMax,
                 Min,
                 Max,
+                ColorHDR,
                 Null
             }
 
@@ -453,17 +454,23 @@ namespace YMToonURP.Timeline.Editor
                     propertyAttributesType = PropertyAttributesType.MinMax;
                     min = (float)GetPropertyAttributesMin(parameter);
                     max = (float)GetPropertyAttributesMax(parameter);
-                    
                 }
                 else if (typeName.Contains("Min"))
                 {
                     propertyAttributesType = PropertyAttributesType.Min;
                     min = (float)GetPropertyAttributesMin(parameter);
                 }
-                else if (typeof(T).Name.Contains("Max"))
+                else if (typeName.Contains("Max"))
                 {
                     propertyAttributesType = PropertyAttributesType.Max;
                     max = (float)GetPropertyAttributesMax(parameter);
+                }
+                else if (typeName.Contains("ColorParameter"))
+                {
+                    if((parameter as ColorParameter).hdr 
+                       // && (parameter as ColorParameter).showAlpha // 不管这个，都显示
+                       )
+                        propertyAttributesType = PropertyAttributesType.ColorHDR;
                 }
             }
             
