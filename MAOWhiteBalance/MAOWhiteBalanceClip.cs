@@ -13,9 +13,10 @@ using UnityEngine.Rendering.Universal;
 namespace MAOTimelineExtension.VolumeExtensions
 {
     [Serializable]
-    public class MAOChromaticAberrationClip : PlayableAsset, ITimelineClipAsset
+    public class MAOWhiteBalanceClip : PlayableAsset, ITimelineClipAsset
     {
-        public float intensity;
+        [Range(-100f, 100f)] public float temperature = 4.6f;
+        [Range(-100f, 100f)] public float tint = 0f;
 
 
         public ClipCaps clipCaps
@@ -25,10 +26,11 @@ namespace MAOTimelineExtension.VolumeExtensions
 
         public override Playable CreatePlayable(PlayableGraph graph, GameObject owner)
         {
-            var playable = ScriptPlayable<MAOChromaticAberrationBehaviour>.Create(graph);
+            var playable = ScriptPlayable<MAOWhiteBalanceBehaviour>.Create(graph);
             var behaviour = playable.GetBehaviour();
 
-            behaviour.Intensity = intensity;
+            behaviour.Temperature = temperature;
+            behaviour.Tint = tint;
 
 
             return playable;

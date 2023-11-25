@@ -12,9 +12,17 @@ using UnityEngine.Rendering.Universal;
 
 namespace MAOTimelineExtension.VolumeExtensions
 {
-    public class MAOChromaticAberrationBehaviour : PlayableBehaviour
+    public class MAOChannelMixerBehaviour : PlayableBehaviour
     {
-        public float Intensity;
+        public float RedOutRedIn;
+        public float RedOutGreenIn;
+        public float RedOutBlueIn;
+        public float GreenOutRedIn;
+        public float GreenOutGreenIn;
+        public float GreenOutBlueIn;
+        public float BlueOutRedIn;
+        public float BlueOutGreenIn;
+        public float BlueOutBlueIn;
 
     }
 }

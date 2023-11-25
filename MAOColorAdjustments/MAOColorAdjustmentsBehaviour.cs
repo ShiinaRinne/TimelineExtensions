@@ -9,12 +9,16 @@ using UnityEngine.Playables;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
-public class MAOColorAdjustmentsBehaviour : PlayableBehaviour
-{
-    public float PostExposure;
-    public float Contrast;
-    public Color ColorFilter;
-    public float HueShift;
-    public float Saturation;
 
+namespace MAOTimelineExtension.VolumeExtensions
+{
+    public class MAOColorAdjustmentsBehaviour : PlayableBehaviour
+    {
+        public float PostExposure;
+        public float Contrast;
+        public Color ColorFilter;
+        public float HueShift;
+        public float Saturation;
+
+    }
 }

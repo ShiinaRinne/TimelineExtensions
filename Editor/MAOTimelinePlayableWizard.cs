@@ -7,9 +7,10 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Timeline;
 using UnityEngine.Rendering;
+using UnityEngine.Serialization;
 
 
-namespace YMToonURP.Timeline.Editor
+namespace MAOTimelineExtension.Editor
 {
     public partial class MaoTimelinePlayableWizard : EditorWindow
     {
@@ -238,7 +239,7 @@ namespace YMToonURP.Timeline.Editor
             public PropertyInfo propertyInfo;
             public FieldInfo fieldInfo;
 
-            int m_TypeIndex;
+            public int typeIndex;
 
             public string NameWithCaptial
             {
@@ -575,15 +576,15 @@ namespace YMToonURP.Timeline.Editor
                 bool removeThis = false;
                 EditorGUILayout.BeginHorizontal();
 
-                m_TypeIndex = EditorGUILayout.Popup(m_TypeIndex, GetNameWithSortingArray(allUsableProperties),
+                typeIndex = EditorGUILayout.Popup(typeIndex, GetNameWithSortingArray(allUsableProperties),
                     GUILayout.Width(200f));
-                type = allUsableProperties[m_TypeIndex].type;
-                name = allUsableProperties[m_TypeIndex].name;
-                usablePropertyType = allUsableProperties[m_TypeIndex].usablePropertyType;
-                propertyInfo = allUsableProperties[m_TypeIndex].propertyInfo;
-                fieldInfo = allUsableProperties[m_TypeIndex].fieldInfo;
-                usability = allUsableProperties[m_TypeIndex].usability;
-                GUILayout.Label(allUsableProperties[m_TypeIndex].type, GUILayout.Width(150f));
+                type = allUsableProperties[typeIndex].type;
+                name = allUsableProperties[typeIndex].name;
+                usablePropertyType = allUsableProperties[typeIndex].usablePropertyType;
+                propertyInfo = allUsableProperties[typeIndex].propertyInfo;
+                fieldInfo = allUsableProperties[typeIndex].fieldInfo;
+                usability = allUsableProperties[typeIndex].usability;
+                GUILayout.Label(allUsableProperties[typeIndex].type, GUILayout.Width(150f));
                 if (GUILayout.Button("Remove", GUILayout.Width(60f)))
                 {
                     removeThis = true;
@@ -623,6 +624,7 @@ namespace YMToonURP.Timeline.Editor
                     ? new UsableProperty(propertyInfo)
                     : new UsableProperty(fieldInfo);
                 duplicate.defaultValue = defaultValue;
+                duplicate.typeIndex = typeIndex;
                 return duplicate;
             }
         }
@@ -1199,16 +1201,7 @@ namespace YMToonURP.Timeline.Editor
                     m_TrackBindingUsableProperties.Add(new UsableProperty(trackBindingField));
                 }
 
-                // fieldInfos = fieldInfos.Where(x => IsTypeBlendable(x.FieldType));
-                // m_TrackBindingFields = fieldInfos.ToArray();
-                // foreach (FieldInfo trackBindingField in m_TrackBindingFields)
-                // {
-                //     m_TrackBindingUsableBlendProperties.Add(new UsableProperty(trackBindingField));
-                // }
-
-                m_TrackBindingUsableProperties = m_TrackBindingUsableProperties.ToList();
-                // m_TrackBindingUsableBlendProperties = m_TrackBindingUsableBlendProperties.ToList();
-
+                m_TrackBindingUsableProperties = m_TrackBindingUsableProperties.Where(x=>IsObsolete(x)==false).ToList();
                 postProcessVolumeProperties.Clear();
             }
 
@@ -1230,11 +1223,26 @@ namespace YMToonURP.Timeline.Editor
             if (indexToRemove != -1)
                 postProcessVolumeProperties.RemoveAt(indexToRemove);
 
-            if (GUILayout.Button("Add", GUILayout.Width(40f)))
+            var availableProperties = m_TrackBindingUsableProperties
+                .Where(property => !postProcessVolumeProperties.Any(p => p.name == property.name))
+                .ToList();
+            
+            if (availableProperties.Count > 0)
             {
-                postProcessVolumeProperties.Add(m_TrackBindingUsableProperties[0].GetDuplicate());
+                if (GUILayout.Button("Add", GUILayout.Width(40f)))
+                {
+                    var dup = availableProperties[0].GetDuplicate();
+                    dup.typeIndex = m_TrackBindingUsableProperties.FindIndex(p => p.name == dup.name);;
+                    postProcessVolumeProperties.Add(dup);
+                }
             }
-
+            else
+            {
+                EditorGUILayout.HelpBox(
+                    "No more properties to add",
+                    MessageType.Info);
+            }
+            
             if (postProcessVolumeProperties.Any(IsObsolete))
                 EditorGUILayout.HelpBox(
                     "One or more of your chosen properties are marked 'Obsolete'.  Consider changing them to avoid deprecation with future versions of Unity.",

@@ -9,12 +9,13 @@ using UnityEngine.Playables;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
-public class MAOVignetteBehaviour : PlayableBehaviour
-{
-    public Color Color;
-    public Vector2 Center;
-    public float Intensity;
-    public float Smoothness;
-    public bool Rounded;
 
+namespace MAOTimelineExtension.VolumeExtensions
+{
+    public class MAOWhiteBalanceBehaviour : PlayableBehaviour
+    {
+        public float Temperature;
+        public float Tint;
+
+    }
 }

@@ -9,33 +9,37 @@ using UnityEngine.Playables;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
-[Serializable]
-public class MAOColorAdjustmentsClip : PlayableAsset, ITimelineClipAsset
+
+namespace MAOTimelineExtension.VolumeExtensions
 {
-    public float postExposure = 0f;
-    [Range(-100f, 100f)] public float contrast = 0f;
-    [ColorUsage(false, true)] public Color colorFilter = new Color(1f, 1f, 1f, 1f);
-    [Range(-180f, 180f)] public float hueShift = 0f;
-    [Range(-100f, 100f)] public float saturation = 0f;
-
-
-    public ClipCaps clipCaps
+    [Serializable]
+    public class MAOColorAdjustmentsClip : PlayableAsset, ITimelineClipAsset
     {
-        get { return ClipCaps.Blending; }
-    }
-
-    public override Playable CreatePlayable(PlayableGraph graph, GameObject owner)
-    {
-        var playable = ScriptPlayable<MAOColorAdjustmentsBehaviour>.Create(graph);
-        var behaviour = playable.GetBehaviour();
-
-        behaviour.PostExposure = postExposure;
-        behaviour.Contrast = contrast;
-        behaviour.ColorFilter = colorFilter;
-        behaviour.HueShift = hueShift;
-        behaviour.Saturation = saturation;
+        public float postExposure = 0.1f;
+        [Range(-100f, 100f)] public float contrast = -3.2f;
+        [ColorUsage(true, true)] public Color colorFilter = new Color(1f, 1f, 1f, 1f);
+        [Range(-180f, 180f)] public float hueShift = 0f;
+        [Range(-100f, 100f)] public float saturation = 18.2f;
 
 
-        return playable;
+        public ClipCaps clipCaps
+        {
+            get { return ClipCaps.Blending; }
+        }
+
+        public override Playable CreatePlayable(PlayableGraph graph, GameObject owner)
+        {
+            var playable = ScriptPlayable<MAOColorAdjustmentsBehaviour>.Create(graph);
+            var behaviour = playable.GetBehaviour();
+
+            behaviour.PostExposure = postExposure;
+            behaviour.Contrast = contrast;
+            behaviour.ColorFilter = colorFilter;
+            behaviour.HueShift = hueShift;
+            behaviour.Saturation = saturation;
+
+
+            return playable;
+        }
     }
 }

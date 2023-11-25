@@ -12,11 +12,12 @@ using UnityEngine.Rendering.Universal;
 
 namespace MAOTimelineExtension.VolumeExtensions
 {
-    public class MAOChromaticAberrationMixerBehaviour : PlayableBehaviour
+    public class MAOWhiteBalanceMixerBehaviour : PlayableBehaviour
     {
-        float m_DefaultIntensity;
+        float m_DefaultTemperature;
+        float m_DefaultTint;
 
-        ChromaticAberration m_TrackBinding;
+        WhiteBalance m_TrackBinding;
         bool m_FirstFrameHappened;
 
         public override void ProcessFrame(Playable playable, FrameData info, object playerData)
@@ -27,14 +28,16 @@ namespace MAOTimelineExtension.VolumeExtensions
             
             if(!m_FirstFrameHappened)
             {
-                m_DefaultIntensity = m_TrackBinding.intensity.value;
+                m_DefaultTemperature = m_TrackBinding.temperature.value;
+                m_DefaultTint = m_TrackBinding.tint.value;
 
                 m_FirstFrameHappened = true;
             }
 
 
             int inputCount = playable.GetInputCount();
-            float blendedIntensity = 0f;
+            float blendedTemperature = 0f;
+            float blendedTint = 0f;
 
             float totalWeight = 0f;
             float greatestWeight = 0f;
@@ -43,10 +46,11 @@ namespace MAOTimelineExtension.VolumeExtensions
             for(int i = 0; i < inputCount; i++)
             {
                 float inputWeight = playable.GetInputWeight(i);
-                ScriptPlayable<MAOChromaticAberrationBehaviour> inputPlayable =(ScriptPlayable<MAOChromaticAberrationBehaviour>)playable.GetInput(i);
-                MAOChromaticAberrationBehaviour input = inputPlayable.GetBehaviour();
+                ScriptPlayable<MAOWhiteBalanceBehaviour> inputPlayable =(ScriptPlayable<MAOWhiteBalanceBehaviour>)playable.GetInput(i);
+                MAOWhiteBalanceBehaviour input = inputPlayable.GetBehaviour();
                 
-                blendedIntensity += input.Intensity * inputWeight;
+                blendedTemperature += input.Temperature * inputWeight;
+                blendedTint += input.Tint * inputWeight;
 
                 totalWeight += inputWeight;
 
@@ -58,7 +62,8 @@ namespace MAOTimelineExtension.VolumeExtensions
                 if (!Mathf.Approximately (inputWeight, 0f))
                     currentInputs++;
             }
-            m_TrackBinding.intensity.value = blendedIntensity + m_DefaultIntensity * (1f-totalWeight);
+            m_TrackBinding.temperature.value = blendedTemperature + m_DefaultTemperature * (1f-totalWeight);
+            m_TrackBinding.tint.value = blendedTint + m_DefaultTint * (1f-totalWeight);
 
         }
 
@@ -71,7 +76,8 @@ namespace MAOTimelineExtension.VolumeExtensions
             if(m_TrackBinding == null)
                 return;
 
-            m_TrackBinding.intensity.value = m_DefaultIntensity;
+            m_TrackBinding.temperature.value = m_DefaultTemperature;
+            m_TrackBinding.tint.value = m_DefaultTint;
 
         }
     }

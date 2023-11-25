@@ -3,10 +3,10 @@
 ## Introduction
 
 这个库包含一些对Unity Timeline的扩展。<br>
-可以在不编写代码的情况下更轻松的通过Timeline编辑属性，或者快速开发原型。
+可以在不编写代码的情况下更轻松的通过Timeline编辑Volume或Object属性，或者快速开发原型。
 
-在这个repo里，我扩展了一些Unity原有的后处理Volume，可以直接导入项目使用,<br>
-也可以通过”**MAO Timeline Playable Wizard**”这个工具来自行扩展。
+目前这个repo里有一些Unity URP原有的后处理Volume的扩展，用来在Timeline中动态调节Volume<br>
+可以直接导入项目使用, 也可以通过”**MAO Timeline Playable Wizard**”这个工具自行扩展。
 
 ![](https://r2.youngmoe.com/ym-r2-bucket/2023/11/fb552984c57c7f0d554303d97d4387c6.gif)
 
@@ -22,9 +22,6 @@
 - `Vector4Parameter`
 - `ColorParameter`
 - `TextureParameter`
-
-> `BoolParameter`和`TextureParameter` 可能没什么用处，是我闲的没事硬加上去的，
-> 混合方式为：当Clip的混合权重>0.5时，会变为下一个Clip的值，一般来说不用管~
 
 ### 目前不支持或没有经过完全测试的：
 
@@ -42,15 +39,23 @@
 ### Typical usecase
 
 1. 打开Timeline窗口，创建一个新的Timeline
-2. 在Scene中创建一个Volume
+2. 在Scene中创建一个Volume，添加 `TimelineExtensionVolumeSettings` 组件
 3. 在Timeline中添加一个新的Track。如果是直接使用的这个repo，它的名字应该以`MAO`开头，例如`MAOBloom`
-4. 将你创建的Volume绑定到这个Track上
+4. 将创建的 `TimelineExtensionVolumeSettings` 组件绑定到这个Track上
 5. 在Track中添加新的Clip，编辑属性，或者与其他的Clip进行混合即可
+
+#### `TimelineExtensionVolumeSettings` 组件设置:
+- `VolumeAccessType`:
+   - `Profile`: 访问 `profile` 的副本，不会影响原本的 `volume profile`文件（但编辑模式下通过 Timeline 控制之后，手动调节的 Volume 参数无法保存）
+   - `Shared Profile`：访问 `profile` 的引用，做的修改会直接影响到原本的 `volume profile` 文件，类似于 Editor 模式下修改 Volume 属性。当退出运行模式后无法重置设置
+   
+   推荐在 Editor 模式下使用 `Shared Profile`，在 `Play` 模式下使用 `Profile`<br>
+   如果需要使用这种方式，可以勾选 `AutoSwitchType` 自动切换<br>
+   更多信息可以参考 [Unity官方文档](https://docs.unity3d.com/Packages/com.unity.render-pipelines.high-definition@16.0/manual/Volumes-API.html#access-a-shared-volume-profile)
 
 ### Wizard Usage
 
-这是一个可以快速生成Timeline扩展的工具
-
+这是一个可以快速生成Timeline扩展的工具<br>
 它可以直接获取当前AppDomain下的所有类，并通过C#反射来获取需要的字段，这样就不再需要自己写扩展了~
 
 > 现在仅支持 `VolumeComponent`，`Component`模式尚未开发完成
@@ -79,7 +84,7 @@
 ## TODO
 
 - [x]  在生成时，自动获取`[Range()]`,`[Min()]`,`[Max()]`这些属性
-- [ ]  优化添加属性时候的操作
+- [x]  优化添加属性时候的操作
 - [ ]  添加对更多类型参数的支持
 - [ ]  支持一些高级设置，例如`Blend Curves`,`Easing-in and Easing-out`.
 

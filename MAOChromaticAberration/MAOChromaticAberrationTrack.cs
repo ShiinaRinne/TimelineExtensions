@@ -9,13 +9,18 @@ using UnityEngine.Playables;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
-[TrackColor(0.9411765f, 0.972549f, 1f)]
-[TrackClipType(typeof(MAOChromaticAberrationClip))]
-[TrackBindingType(typeof(Volume))]
-public class MAOChromaticAberrationTrack : TrackAsset
+
+namespace MAOTimelineExtension.VolumeExtensions
 {
-    public override Playable CreateTrackMixer(PlayableGraph graph, GameObject go, int inputCount)
+    [TrackColor(0.9411765f, 0.972549f, 1f)]
+    [TrackClipType(typeof(MAOChromaticAberrationClip))]
+    [TrackBindingType(typeof(TimelineExtensionVolumeSettings))]
+    public class MAOChromaticAberrationTrack : TrackAsset
     {
-        return ScriptPlayable<MAOChromaticAberrationMixerBehaviour>.Create(graph, inputCount);
+        public override Playable CreateTrackMixer(PlayableGraph graph, GameObject go, int inputCount)
+        {
+            return ScriptPlayable<MAOChromaticAberrationMixerBehaviour>.Create(graph, inputCount);
+        }
     }
 }
+

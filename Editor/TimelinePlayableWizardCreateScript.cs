@@ -9,9 +9,9 @@ using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Rendering;
 using UnityEngine.Timeline;
-using YMToonURP.Scripts;
+using MAOTimelineExtension.Scripts;
 
-namespace YMToonURP.Timeline.Editor
+namespace MAOTimelineExtension.Editor
 {
     public partial class MaoTimelinePlayableWizard : EditorWindow
     {
@@ -88,30 +88,32 @@ namespace YMToonURP.Timeline.Editor
 
         string VolumeBlendPlayableAsset()
         {
-            // TODO: Attributes [Range]
-            return
-                @$"{Note()}
+            return ""+
+@$"{Note()}
 
 {AllNeededNameSpace()}
 
-[Serializable]
-public class {playableName}{k_TimelineClipAssetSuffix} : PlayableAsset, ITimelineClipAsset
+namespace MAOTimelineExtension.VolumeExtensions
 {{
+    [Serializable]
+    public class {playableName}{k_TimelineClipAssetSuffix} : PlayableAsset, ITimelineClipAsset
+    {{
 {VolumeBlendScriptPlayablePropertiesToStringWithDefaultValue()}
 
-    public ClipCaps clipCaps
-    {{
-        get {{ return ClipCaps.Blending; }}
-    }}
+        public ClipCaps clipCaps
+        {{
+            get {{ return ClipCaps.Blending; }}
+        }}
 
-    public override Playable CreatePlayable(PlayableGraph graph, GameObject owner)
-    {{
-        var playable = ScriptPlayable<{playableName}{k_TimelineClipBehaviourSuffix}>.Create(graph);
-        var behaviour = playable.GetBehaviour();
+        public override Playable CreatePlayable(PlayableGraph graph, GameObject owner)
+        {{
+            var playable = ScriptPlayable<{playableName}{k_TimelineClipBehaviourSuffix}>.Create(graph);
+            var behaviour = playable.GetBehaviour();
 
 {VolumeBlendScriptPlayablePropertiesInitialize()}
 
-        return playable;
+            return playable;
+        }}
     }}
 }}
 ";
@@ -122,7 +124,7 @@ public class {playableName}{k_TimelineClipAssetSuffix} : PlayableAsset, ITimelin
             string returnVal = "";
             foreach (var prop in postProcessVolumeProperties)
             {
-                returnVal += $"        behaviour.{prop.NameWithCaptial} = {prop.name};\r\n";
+                returnVal += $"{k_Tab.Repeat(3)}behaviour.{prop.NameWithCaptial} = {prop.name};\r\n";
             }
 
             return returnVal;
@@ -130,93 +132,104 @@ public class {playableName}{k_TimelineClipAssetSuffix} : PlayableAsset, ITimelin
 
         string VolumeBlendPlayableBehaviour()
         {
-            return
-                @$"{Note()}
+            return ""+
+@$"{Note()}
 
 {AllNeededNameSpace()}
 
-public class {playableName}{k_TimelineClipBehaviourSuffix} : PlayableBehaviour
+namespace MAOTimelineExtension.VolumeExtensions
 {{
+    public class {playableName}{k_TimelineClipBehaviourSuffix} : PlayableBehaviour
+    {{
 {VolumeBlendScriptPlayablePropertiesToString()}
+    }}
 }}
 ";
         }
 
         string VolumeBlendPlayableBehaviourMixer()
         {
-            return
-                @$"{Note()}
+            return ""+
+@$"{Note()}
 
 {AllNeededNameSpace()}
 
-public class {playableName}{k_PlayableBehaviourMixerSuffix} : PlayableBehaviour
+namespace MAOTimelineExtension.VolumeExtensions
 {{
-{VolumeBlendTrackBindingPropertiesDefaultsDeclarationToString()}
-    {trackBinding.name} m_TrackBinding;
-    bool m_FirstFrameHappened;
-
-    public override void ProcessFrame(Playable playable, FrameData info, object playerData)
+    public class {playableName}{k_PlayableBehaviourMixerSuffix} : PlayableBehaviour
     {{
+{VolumeBlendTrackBindingPropertiesDefaultsDeclarationToString()}
+        {trackBinding.name} m_TrackBinding;
+        bool m_FirstFrameHappened;
+
+        public override void ProcessFrame(Playable playable, FrameData info, object playerData)
+        {{
 {MixerTrackBindingLocalVariableToString()}
 
-        int inputCount = playable.GetInputCount();
+            int inputCount = playable.GetInputCount();
 {VolumeBlendedVariablesCreationToString()}
-        float totalWeight = 0f;
-        float greatestWeight = 0f;
-        int currentInputs = 0;
+            float totalWeight = 0f;
+            float greatestWeight = 0f;
+            int currentInputs = 0;
 
-        for(int i = 0; i < inputCount; i++)
-        {{
-            float inputWeight = playable.GetInputWeight(i);
-            ScriptPlayable<{playableName}{k_TimelineClipBehaviourSuffix}> inputPlayable =(ScriptPlayable<{playableName}{k_TimelineClipBehaviourSuffix}>)playable.GetInput(i);
-            {playableName}{k_TimelineClipBehaviourSuffix} input = inputPlayable.GetBehaviour();
-            
-{VolumeAssignedVariablesWeightedIncrementationToString()}
-            totalWeight += inputWeight;
-
-            if (inputWeight > greatestWeight)
+            for(int i = 0; i < inputCount; i++)
             {{
-                greatestWeight = inputWeight;
+                float inputWeight = playable.GetInputWeight(i);
+                ScriptPlayable<{playableName}{k_TimelineClipBehaviourSuffix}> inputPlayable =(ScriptPlayable<{playableName}{k_TimelineClipBehaviourSuffix}>)playable.GetInput(i);
+                {playableName}{k_TimelineClipBehaviourSuffix} input = inputPlayable.GetBehaviour();
+                
+{VolumeAssignedVariablesWeightedIncrementationToString()}
+                totalWeight += inputWeight;
+
+                if (inputWeight > greatestWeight)
+                {{
+                    greatestWeight = inputWeight;
+                }}
+
+                if (!Mathf.Approximately (inputWeight, 0f))
+                    currentInputs++;
             }}
-
-            if (!Mathf.Approximately (inputWeight, 0f))
-                currentInputs++;
-        }}
 {VolumeTrackBindingPropertiesAssignableAssignmentToString()}
-    }}
+        }}
 
 
 
-    public override void OnPlayableDestroy (Playable playable)
-    {{
-        m_FirstFrameHappened = false;
+        public override void OnPlayableDestroy (Playable playable)
+        {{
+            m_FirstFrameHappened = false;
 
-        if(m_TrackBinding == null)
-            return;
+            if(m_TrackBinding == null)
+                return;
 
 {VolumeRecoveryOriginalValue()}
+        }}
     }}
 }}
+
 ";
         }
 
         string VolumeTrackAssetScript()
         {
-            return
-                @$"{Note()}
+            return ""+
+@$"{Note()}
 
 {AllNeededNameSpace()}
 
-[TrackColor({trackColor.r}f, {trackColor.g}f, {trackColor.b}f)]
-[TrackClipType(typeof({playableName}{k_TimelineClipAssetSuffix}))]
-{TrackBindingToString()}
-public class {playableName}{k_TrackAssetSuffix} : TrackAsset
+namespace MAOTimelineExtension.VolumeExtensions
 {{
-    public override Playable CreateTrackMixer(PlayableGraph graph, GameObject go, int inputCount)
+    [TrackColor({trackColor.r}f, {trackColor.g}f, {trackColor.b}f)]
+    [TrackClipType(typeof({playableName}{k_TimelineClipAssetSuffix}))]
+    {TrackBindingToString()}
+    public class {playableName}{k_TrackAssetSuffix} : TrackAsset
     {{
-        return ScriptPlayable<{playableName}{k_PlayableBehaviourMixerSuffix}>.Create(graph, inputCount);
+        public override Playable CreateTrackMixer(PlayableGraph graph, GameObject go, int inputCount)
+        {{
+            return ScriptPlayable<{playableName}{k_PlayableBehaviourMixerSuffix}>.Create(graph, inputCount);
+        }}
     }}
 }}
+
 ";
         }
 
@@ -253,11 +266,11 @@ public class {playableName}{k_TrackAssetSuffix} : TrackAsset
                 string attributes = VolumeBlendScriptPlayablePropertiesGetPropertyAttributes(prop);
                 if (prop.defaultValue == "")
                 {
-                    returnVal += $"    {attributes}public {prop.type} {prop.name};\r\n";
+                    returnVal += $"{k_Tab.Repeat(2)}{attributes}public {prop.type} {prop.name};\r\n";
                 }
                 else
                 {
-                    returnVal += $"    {attributes}public {prop.type} {prop.name} = {prop.defaultValue};\r\n";
+                    returnVal += $"{k_Tab.Repeat(2)}{attributes}public {prop.type} {prop.name} = {prop.defaultValue};\r\n";
                 }
             }
 
@@ -270,7 +283,7 @@ public class {playableName}{k_TrackAssetSuffix} : TrackAsset
             for (int i = 0; i < postProcessVolumeProperties.Count; i++)
             {
                 UsableProperty prop = postProcessVolumeProperties[i];
-                returnVal += $"    public {prop.type} {prop.NameWithCaptial};\r\n";
+                returnVal += $"{k_Tab.Repeat(2)}public {prop.type} {prop.NameWithCaptial};\r\n";
             }
 
             return returnVal;
@@ -282,7 +295,7 @@ public class {playableName}{k_TrackAssetSuffix} : TrackAsset
             for (int i = 0; i < postProcessVolumeProperties.Count; i++)
             {
                 UsableProperty prop = postProcessVolumeProperties[i];
-                returnVal += k_Tab + prop.type + " " + prop.NameAsPrivateDefault + ";\n";
+                returnVal += $"{k_Tab.Repeat(2)}{prop.type} {prop.NameAsPrivateDefault};\n";
             }
 
             return returnVal;
@@ -294,7 +307,7 @@ public class {playableName}{k_TrackAssetSuffix} : TrackAsset
             for (int i = 0; i < postProcessVolumeProperties.Count; i++)
             {
                 UsableProperty prop = postProcessVolumeProperties[i];
-                returnVal += $"            {prop.NameAsPrivateDefault} = m_TrackBinding.{prop.name}.value;\n";
+                returnVal += $"{k_Tab.Repeat(4)}{prop.NameAsPrivateDefault} = m_TrackBinding.{prop.name}.value;\n";
             }
 
             return returnVal;
@@ -306,7 +319,7 @@ public class {playableName}{k_TrackAssetSuffix} : TrackAsset
             for (int i = 0; i < postProcessVolumeProperties.Count; i++)
             {
                 UsableProperty prop = postProcessVolumeProperties[i];
-                returnVal += $"        m_TrackBinding.{prop.name}.value = {prop.NameAsPrivateDefault};\n";
+                returnVal += $"{k_Tab.Repeat(3)}m_TrackBinding.{prop.name}.value = {prop.NameAsPrivateDefault};\n";
             }
 
             return returnVal;
@@ -321,10 +334,9 @@ public class {playableName}{k_TrackAssetSuffix} : TrackAsset
                 UsableProperty prop = postProcessVolumeProperties[i];
                 string type = prop.type == "int" ? "float" : prop.type;
                 string zeroVal = type == "int" ? "0f" : prop.ZeroValueAsString();
-                returnVal += k_Tab + k_Tab + type + " " + prop.NameAsLocalBlended + " = " + zeroVal + ";\n";
+                returnVal += $"{k_Tab.Repeat(3)}{type} {prop.NameAsLocalBlended} = {zeroVal};\n";
             }
-
-
+            
             return returnVal;
         }
 
@@ -337,12 +349,11 @@ public class {playableName}{k_TrackAssetSuffix} : TrackAsset
                 if (prop.usability != UsableProperty.Usability.Blendable)
                 {
                     returnVal +=
-                        $"            {prop.NameAsLocalBlended} = inputWeight > 0.5 ? input.{prop.name.Title()} : {prop.NameAsLocalBlended};\n";
+                        $"{k_Tab.Repeat(4)}{prop.NameAsLocalBlended} = inputWeight > 0.5 ? input.{prop.name.Title()} : {prop.NameAsLocalBlended};\n";
                 }
                 else
                 {
-                    returnVal += k_Tab + k_Tab + k_Tab + prop.NameAsLocalBlended + " += input." + prop.name.Title() +
-                                 " * inputWeight;\n";
+                    returnVal += $"{k_Tab.Repeat(4)}{prop.NameAsLocalBlended} += input.{prop.name.Title()} * inputWeight;\n";
                 }
             }
 
@@ -357,16 +368,16 @@ public class {playableName}{k_TrackAssetSuffix} : TrackAsset
                 UsableProperty prop = postProcessVolumeProperties[i];
                 if (prop.usability != UsableProperty.Usability.Blendable)
                 {
-                    returnVal += $"        m_TrackBinding.{prop.name}.value = {prop.NameAsLocalBlended};\n";
+                    returnVal += $"{k_Tab.Repeat(3)}m_TrackBinding.{prop.name}.value = {prop.NameAsLocalBlended};\n";
                 }
                 else
                 {
                     if (prop.type == "int")
                         returnVal +=
-                            $"        m_TrackBinding.{prop.name}.value = Mathf.RoundToInt({prop.NameAsLocalBlended} + {prop.NameAsPrivateDefault} * (1f-totalWeight));\n";
+                            $"{k_Tab.Repeat(3)}m_TrackBinding.{prop.name}.value = Mathf.RoundToInt({prop.NameAsLocalBlended} + {prop.NameAsPrivateDefault} * (1f-totalWeight));\n";
                     else
                         returnVal +=
-                            $"        m_TrackBinding.{prop.name}.value = {prop.NameAsLocalBlended} + {prop.NameAsPrivateDefault} * (1f-totalWeight);\n";
+                            $"{k_Tab.Repeat(3)}m_TrackBinding.{prop.name}.value = {prop.NameAsLocalBlended} + {prop.NameAsPrivateDefault} * (1f-totalWeight);\n";
                 }
             }
 
@@ -375,7 +386,7 @@ public class {playableName}{k_TrackAssetSuffix} : TrackAsset
 
         string Note()
         {
-            return
+            return ""+
 @"// This code is automatically generated by MAO Timeline Playable Wizard.
 // For more information, please visit 
 // https://github.com/ShiinaRinne/TimelineExtensions";
@@ -388,7 +399,6 @@ using UnityEngine;
 using UnityEngine.Timeline;
 using UnityEngine.Playables;
 using UnityEngine.Rendering;
-using UnityEngine.Rendering.Universal;
 " + AdditionalNamespacesToString();
         }
 
@@ -404,7 +414,7 @@ using UnityEngine.Rendering.Universal;
 
             if (workType == WorkType.VolumeComponent)
             {
-                return "[TrackBindingType(typeof(Volume))]";
+                return "[TrackBindingType(typeof(TimelineExtensionVolumeSettings))]";
             }
 
             return "";
@@ -533,15 +543,15 @@ using UnityEngine.Rendering.Universal;
             if (workType == WorkType.VolumeComponent)
             {
                 return
-                    @$"        ((Volume) playerData).profile.TryGet(out m_TrackBinding);
-        if (m_TrackBinding == null)
-            return;
-        
-        if(!m_FirstFrameHappened)
-        {{
+            @$"{k_Tab.Repeat(3)}((TimelineExtensionVolumeSettings) playerData).VolumeProfile.TryGet(out m_TrackBinding);
+            if (m_TrackBinding == null)
+                return;
+            
+            if(!m_FirstFrameHappened)
+            {{
 {VolumeSaveOriginalValue()}
-            m_FirstFrameHappened = true;
-        }}
+                m_FirstFrameHappened = true;
+            }}
 ";
             }
 

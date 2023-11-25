@@ -13,13 +13,13 @@ using UnityEngine.Rendering.Universal;
 namespace MAOTimelineExtension.VolumeExtensions
 {
     [TrackColor(0.9411765f, 0.972549f, 1f)]
-    [TrackClipType(typeof(MAODepthOfFieldBokehClip))]
+    [TrackClipType(typeof(MAOWhiteBalanceClip))]
     [TrackBindingType(typeof(TimelineExtensionVolumeSettings))]
-    public class MAODepthOfFieldBokehTrack : TrackAsset
+    public class MAOWhiteBalanceTrack : TrackAsset
     {
         public override Playable CreateTrackMixer(PlayableGraph graph, GameObject go, int inputCount)
         {
-            return ScriptPlayable<MAODepthOfFieldBokehMixerBehaviour>.Create(graph, inputCount);
+            return ScriptPlayable<MAOWhiteBalanceMixerBehaviour>.Create(graph, inputCount);
         }
     }
 }

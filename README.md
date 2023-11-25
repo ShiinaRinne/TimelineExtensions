@@ -4,14 +4,14 @@ English | [中文](README_CN.md)
 ## Introduction
 
 Some extensions for Unity Timeline. 
-You can edit properties in the Timeline more easily **without writing code**,<br> 
+You can edit `Volume` or `GameObject`'s properties in the Timeline more easily **without writing code**,<br> 
 or help you quickly develop prototypes.
 
 [//]: # (This project was originally developed mainly to expand the post-processing volume, 
 and will gradually improve other types in the future.)
 
-At present, I have expanded Unity's original Volume, you can use it directly, 
-or use "**MAO Timeline Playable Wizard**" to quickly expand.
+At present, there are some extensions to the original post-processing volume of Unity URP in this repo, which are used to dynamically adjust the volume in the timeline<br>
+It can be directly imported into the project for use, or quickly expand through the "**MAO Timeline playable Wizard**" tool.
 
 ![](https://r2.youngmoe.com/ym-r2-bucket/2023/11/fb552984c57c7f0d554303d97d4387c6.gif)
 
@@ -25,9 +25,6 @@ or use "**MAO Timeline Playable Wizard**" to quickly expand.
 - `Vector4Parameter`
 - `ColorParameter`
 - `TextureParameter`
-
->`BoolParameter` and `TextureParameter` may not be of much use, more like my bad taste, their mixing method is: <br>
-when the **mixing weight > 0.5**, it becomes the value of the next Clip, usually you can ignore it.
 
 
 ### Parameters not yet supported or tested:
@@ -61,12 +58,19 @@ when the **mixing weight > 0.5**, it becomes the value of the next Clip, usually
 ### Typical usecase
 
 1. Open the Timeline window and create a new Timeline.
-2. Create a new Global Volume.
+2. Create a new Global Volume, add `TimelineExtensionVolumeSettings` component.
 3. Add a new Track which starts with "MAO", such as `MAOBloom`.
-4. Set TrackBinding to the Volume you need. (**Very important**, after binding, the newly created Clip will get
-   the parameters in the Volume as default values).
+4. Set TrackBinding to the `TimelineExtensionVolumeSettings` component.
 5. Add a new Clip to the Track, edit properties in the Clip or mix with other Clips.<br>
 
+#### `TimelineExtensionVolumeSettings` component settings:
+- VolumeAccessType:
+   - `Profile`: Access a copy of the profile, which will not affect the original volume profile file (but if you adjust the Volume property through Timeline in Editor mode and then manually adjust it, this modification cannot be saved)
+   - `Shared Profile`: Access a reference to the profile, which will directly affect the original `volume profile`. The settings cannot be reset after exiting play mode
+   
+   It is recommended to use `Shared Profile` in Editor mode and `Profile` in Play mode.<br>
+   If you need to use this switching method, you can check `AutoSwitchType`.<br>
+   For more information, please refer to [Unity Documentation](https://docs.unity3d.com/Packages/com.unity.render-pipelines.high-definition@16.0/manual/Volumes-API.html)
 
 ### Wizard Usage
 This is a tool that can quickly generate Timeline extensions for you. <br>
@@ -104,7 +108,7 @@ You can find it in `Assets/TimelineExtensions`
 
 ## TODO
 - [x] Add attributes like `[Range()]`, `[Min()]`, `[Max()]` to the properties of the Clip.
-- [ ] Optimize attribute adding method in "MAO Timeline Playable Wizard".
+- [x] Optimize attribute adding method in "MAO Timeline Playable Wizard".
 - [ ] Add support for more parameters.
 - [ ] Support high-level settings such as `Blend Curves`, `Easing-in and Easing-out`.
 
