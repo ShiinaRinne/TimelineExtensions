@@ -58,31 +58,30 @@
 这是一个可以快速生成Timeline扩展的工具<br>
 它可以直接获取当前AppDomain下的所有类，并通过C#反射来获取需要的字段，这样就不再需要自己写扩展了~
 
-> 现在仅支持 `VolumeComponent`，`Component`模式尚未开发完成
->
 
 **Volume Component：**
 
 1. 在 `Window/MAO Timeline Playable Wizard`打开
 2. 切换 `WorkType`为 `VolumeComponent`，选择需要的 `Track Binding Type`
 
-   ![](https://r2.youngmoe.com/ym-r2-bucket/2023/11/19e8b6032028290d224b7fadef049284.png)
+   <img src="https://r2.youngmoe.com/ym-r2-bucket/2023/11/19e8b6032028290d224b7fadef049284.png" width="50%">
 
 3. 将Default Values设置为Volume
 
-   ![](https://r2.youngmoe.com/ym-r2-bucket/2023/11/7a228f2972434178c205c8aaf67a6b0b.png)
+   <img src="https://r2.youngmoe.com/ym-r2-bucket/2023/11/7a228f2972434178c205c8aaf67a6b0b.png" width="50%">
 
 4. 添加属性
 
-   ![](https://r2.youngmoe.com/ym-r2-bucket/2023/11/14b3980e06f8d6cb0b87f9e74eb025e4.png)
+   <img src="https://r2.youngmoe.com/ym-r2-bucket/2023/11/14b3980e06f8d6cb0b87f9e74eb025e4.png" width="50%">
 
 5. 最后点 `Create`就可以了，等编译完之后就可以使用，你可以在 `Assets/TimelineExtensions`找到生成的脚本
 
-> 使用过程中有任何问题请发issue~
->
+> [!IMPORTANT]
+> 目前不支持Enum类型(例如景深的 Gaussian 或 Bokeh 模式)，如果确实需要的话，可以参考以下方法分成多个Track制作：<br>
+> <img src="https://r2.youngmoe.com/ym-r2-bucket/2023/11/48d3bda1b26b762ac0477f2b94fc2a75.png" width="50%">
+> <img src="https://r2.youngmoe.com/ym-r2-bucket/2023/11/8d325d458c0209b9068427474dce6377.png" width="50%">
 
 ## TODO
-
 - [x]  在生成时，自动获取`[Range()]`,`[Min()]`,`[Max()]`这些属性
 - [x]  优化添加属性时候的操作
 - [ ]  添加对更多类型参数的支持
