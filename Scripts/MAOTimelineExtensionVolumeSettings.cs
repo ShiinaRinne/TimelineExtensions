@@ -4,7 +4,7 @@ using UnityEngine.Rendering;
 namespace MAOTimelineExtension
 {
     [ExecuteAlways]
-    public class TimelineExtensionVolumeSettings : MonoBehaviour
+    public class MAOTimelineExtensionVolumeSettings : MonoBehaviour
     {
         // https://docs.unity3d.com/Packages/com.unity.render-pipelines.high-definition@16.0/manual/Volumes-API.html#access-a-shared-volume-profile
         [Tooltip(""+ 

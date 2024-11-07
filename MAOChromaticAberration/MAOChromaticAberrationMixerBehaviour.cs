@@ -21,7 +21,7 @@ namespace MAOTimelineExtension.VolumeExtensions
 
         public override void ProcessFrame(Playable playable, FrameData info, object playerData)
         {
-            ((TimelineExtensionVolumeSettings) playerData).VolumeProfile.TryGet(out m_TrackBinding);
+            ((MAOTimelineExtensionVolumeSettings) playerData).VolumeProfile.TryGet(out m_TrackBinding);
             if (m_TrackBinding == null)
                 return;
             

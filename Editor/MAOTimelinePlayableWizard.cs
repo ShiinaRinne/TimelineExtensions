@@ -645,7 +645,24 @@ namespace MAOTimelineExtension.Editor
             VolumeComponent
         }
 
-        string m_RootFolderPath = "Assets/TimelineExtensions";
+        private static MAOTimelineExtensionsConfigSO config;
+        public static MAOTimelineExtensionsConfigSO Config
+        {
+            get
+            {
+                if (config == null)
+                {
+                    config = Resources.Load<MAOTimelineExtensionsConfigSO>("MAOTimelineExtensionsConfigSO");
+                    if (config == null)
+                    {
+                        Debug.LogError("Cannot find MAOTimelineExtensionsConfigSO in Resources folder!");
+                    }
+                }
+                return config;
+            }
+        }
+        
+        // string m_RootFolderPath = "Assets/TimelineExtensions";
 
         public bool showHelpBoxes = true;
         public string playableName = "";
@@ -786,8 +803,7 @@ namespace MAOTimelineExtension.Editor
             if (sceneView != null)
                 position = new Vector2(sceneView.position.x, sceneView.position.y);
             wizard.position = new Rect(position.x + k_ScreenSizeWindowBuffer, position.y + k_ScreenSizeWindowBuffer,
-                k_WindowWidth,
-                Mathf.Min(Screen.currentResolution.height - k_ScreenSizeWindowBuffer, k_MaxWindowHeight));
+                k_WindowWidth, Mathf.Min(Screen.currentResolution.height - k_ScreenSizeWindowBuffer, k_MaxWindowHeight));
 
             wizard.showHelpBoxes = EditorPrefs.GetBool(k_ShowHelpBoxesKey);
             wizard.Show();
@@ -861,20 +877,16 @@ namespace MAOTimelineExtension.Editor
 
 
             // Playable name
-            bool playableNameNotEmpty;
-            bool playableNameFormatted;
-            bool playableNameTooLong;
-            GUIPlayableNamePart(out playableNameNotEmpty, out playableNameFormatted, out playableNameTooLong);
+            GUIPlayableNamePart(out bool playableNameNotEmpty, out bool playableNameFormatted, out bool playableNameTooLong);
 
 
             // Work type
             WorkType oldWorkType = workType;
             GUIWorkTypePart();
 
-
             // Track binding type
-            int oldIndex;
-            GUITrackBindingTypePart(out oldIndex);
+            GUITrackBindingTypePart(out int oldIndex, out bool defaultValuesNotExist);
+            
 
 
             // Property
@@ -886,7 +898,8 @@ namespace MAOTimelineExtension.Editor
 
 
             // Create
-            GUICreatePart(playableNameNotEmpty, playableNameFormatted, playableNameTooLong);
+            // defaultValuesNotExist = workType == WorkType.VolumeComponent ^ defaultValuesVolume is not null;
+            GUICreatePart(playableNameNotEmpty, playableNameFormatted, playableNameTooLong, defaultValuesNotExist);
 
 
             // Reset
@@ -957,7 +970,13 @@ namespace MAOTimelineExtension.Editor
             // TODO: Edit the help tooltip
             ShowHelpBoxInfo(showHelpBoxes, m_WorkType);
 
-            workType = (WorkType) EditorGUILayout.EnumPopup("Work type", workType);
+            var newWorkType = (WorkType)EditorGUILayout.EnumPopup("Work type", workType);
+            if (newWorkType != workType)
+            {
+                // WorkType changed, reset related fields
+                workType = newWorkType;
+                m_ComponentBindingTypeIndex = 0;
+            }
 
             EditorGUILayout.EndVertical();
 
@@ -965,12 +984,13 @@ namespace MAOTimelineExtension.Editor
             EditorGUILayout.Space();
         }
 
-        void GUITrackBindingTypePart(out int oldIndex)
+        void GUITrackBindingTypePart(out int oldIndex, out bool defaultValuesNotExist)
         {
             EditorGUILayout.BeginVertical(GUI.skin.box);
             ShowHelpBoxInfo(showHelpBoxes, m_TrackBindingTypeContent);
 
             oldIndex = m_ComponentBindingTypeIndex;
+            defaultValuesNotExist = false;
             if (workType == WorkType.Component)
             {
                 m_ComponentBindingTypeIndex = EditorGUILayout.Popup(m_TrackBindingTypeContent,
@@ -994,6 +1014,12 @@ namespace MAOTimelineExtension.Editor
                 // TODO: Automatically obtain the Global Volume in the scenario where the user is creating a Volume Component
                 defaultValuesVolume = EditorGUILayout.ObjectField(m_DefaultValuesComponentContent, defaultValuesVolume,
                     typeof(Volume), true) as Volume;
+                
+                defaultValuesNotExist = defaultValuesVolume is null;
+                if (defaultValuesNotExist)
+                {
+                    EditorGUILayout.HelpBox("A Volume component is required as the default values source", MessageType.Error);
+                }
             }
 
             EditorGUILayout.EndVertical();
@@ -1026,11 +1052,12 @@ namespace MAOTimelineExtension.Editor
             EditorGUILayout.EndVertical();
         }
 
-        void GUICreatePart(bool playableNameNotEmpty, bool playableNameFormatted, bool playableNameTooLong)
+        void GUICreatePart(bool playableNameNotEmpty, bool playableNameFormatted, bool playableNameTooLong, bool defaultValuesNotExist)
         {
             if (playableNameNotEmpty && playableNameFormatted
                                      // && allUniqueVariableNames && exposedVariablesNamesValid && scriptVariablesNamesValid 
-                                     && !playableNameTooLong)
+                                     && !playableNameTooLong
+                                     && !defaultValuesNotExist)
             {
                 if (GUILayout.Button("Create", GUILayout.Width(60f)))
                 {
@@ -1045,12 +1072,12 @@ namespace MAOTimelineExtension.Editor
                     }
                     else if (workType == WorkType.VolumeComponent)
                     {
-                        var genericMethod = typeof(UsableProperty).GetMethod("CreateSettingDefaultValueStringVolume")
+                        var genericMethod = typeof(UsableProperty).GetMethod("CreateSettingDefaultValueStringVolume")?
                             .MakeGenericMethod(trackBinding.type);
 
                         foreach (var prop in postProcessVolumeProperties)
                         {
-                            genericMethod.Invoke(prop, new object[] {defaultValuesVolume, prop});
+                            genericMethod?.Invoke(prop, new object[] {defaultValuesVolume, prop});
                         }
                     }
 

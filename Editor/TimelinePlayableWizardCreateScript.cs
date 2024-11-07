@@ -32,12 +32,12 @@ namespace MAOTimelineExtension.Editor
             if (m_CreateDrawer && ScriptAlreadyExists(playableName + k_PropertyDrawerSuffix))
                 return CreationError.PlayableDrawerAlreadyExists;
 
-            if (!Directory.Exists(m_RootFolderPath))
+            if (!Directory.Exists(Config.RootFolderPath))
             {
-                Directory.CreateDirectory(m_RootFolderPath);
+                Directory.CreateDirectory(Config.RootFolderPath);
             }
 
-            AssetDatabase.CreateFolder(m_RootFolderPath, playableName);
+            AssetDatabase.CreateFolder(Config.RootFolderPath, playableName);
 
             if (workType == WorkType.Component)
             {
@@ -80,9 +80,9 @@ namespace MAOTimelineExtension.Editor
 
         void CreateScript(string fileName, string content)
         {
-            string path = $"{Application.dataPath}/TimelineExtensions/{playableName}/{fileName}.cs";
-            using (StreamWriter writer = File.CreateText(path))
-                writer.Write(content);
+            string path = $"{Config.RootFolderPath}/{playableName}/{fileName}.cs";
+            using var writer = File.CreateText(path);
+            writer.Write(content);
         }
 
 
@@ -93,7 +93,7 @@ namespace MAOTimelineExtension.Editor
 
 {AllNeededNameSpace()}
 
-namespace MAOTimelineExtension.VolumeExtensions
+namespace {Config.DefaultNameSpace}
 {{
     [Serializable]
     public class {playableName}{k_TimelineClipAssetSuffix} : PlayableAsset, ITimelineClipAsset
@@ -137,7 +137,7 @@ namespace MAOTimelineExtension.VolumeExtensions
 
 {AllNeededNameSpace()}
 
-namespace MAOTimelineExtension.VolumeExtensions
+namespace {Config.DefaultNameSpace}
 {{
     public class {playableName}{k_TimelineClipBehaviourSuffix} : PlayableBehaviour
     {{
@@ -154,7 +154,7 @@ namespace MAOTimelineExtension.VolumeExtensions
 
 {AllNeededNameSpace()}
 
-namespace MAOTimelineExtension.VolumeExtensions
+namespace {Config.DefaultNameSpace}
 {{
     public class {playableName}{k_PlayableBehaviourMixerSuffix} : PlayableBehaviour
     {{
@@ -216,7 +216,7 @@ namespace MAOTimelineExtension.VolumeExtensions
 
 {AllNeededNameSpace()}
 
-namespace MAOTimelineExtension.VolumeExtensions
+namespace {Config.DefaultNameSpace}
 {{
     [TrackColor({trackColor.r}f, {trackColor.g}f, {trackColor.b}f)]
     [TrackClipType(typeof({playableName}{k_TimelineClipAssetSuffix}))]
@@ -399,6 +399,7 @@ using UnityEngine;
 using UnityEngine.Timeline;
 using UnityEngine.Playables;
 using UnityEngine.Rendering;
+using MAOTimelineExtension;
 " + AdditionalNamespacesToString();
         }
 
@@ -414,7 +415,7 @@ using UnityEngine.Rendering;
 
             if (workType == WorkType.VolumeComponent)
             {
-                return "[TrackBindingType(typeof(TimelineExtensionVolumeSettings))]";
+                return "[TrackBindingType(typeof(MAOTimelineExtensionVolumeSettings))]";
             }
 
             return "";
@@ -543,7 +544,7 @@ using UnityEngine.Rendering;
             if (workType == WorkType.VolumeComponent)
             {
                 return
-            @$"{k_Tab.Repeat(3)}((TimelineExtensionVolumeSettings) playerData).VolumeProfile.TryGet(out m_TrackBinding);
+            @$"{k_Tab.Repeat(3)}((MAOTimelineExtensionVolumeSettings) playerData).VolumeProfile.TryGet(out m_TrackBinding);
             if (m_TrackBinding == null)
                 return;
             

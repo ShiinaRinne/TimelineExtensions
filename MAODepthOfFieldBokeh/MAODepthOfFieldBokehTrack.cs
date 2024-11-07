@@ -14,7 +14,7 @@ namespace MAOTimelineExtension.VolumeExtensions
 {
     [TrackColor(0.9411765f, 0.972549f, 1f)]
     [TrackClipType(typeof(MAODepthOfFieldBokehClip))]
-    [TrackBindingType(typeof(TimelineExtensionVolumeSettings))]
+    [TrackBindingType(typeof(MAOTimelineExtensionVolumeSettings))]
     public class MAODepthOfFieldBokehTrack : TrackAsset
     {
         public override Playable CreateTrackMixer(PlayableGraph graph, GameObject go, int inputCount)

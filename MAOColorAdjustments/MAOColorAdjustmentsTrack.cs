@@ -14,7 +14,7 @@ namespace MAOTimelineExtension.VolumeExtensions
 {
     [TrackColor(0.9411765f, 0.972549f, 1f)]
     [TrackClipType(typeof(MAOColorAdjustmentsClip))]
-    [TrackBindingType(typeof(TimelineExtensionVolumeSettings))]
+    [TrackBindingType(typeof(MAOTimelineExtensionVolumeSettings))]
     public class MAOColorAdjustmentsTrack : TrackAsset
     {
         public override Playable CreateTrackMixer(PlayableGraph graph, GameObject go, int inputCount)
