@@ -81,6 +81,12 @@
 > <img src="https://r2.youngmoe.com/ym-r2-bucket/2023/11/48d3bda1b26b762ac0477f2b94fc2a75.png" width="50%">
 > <img src="https://r2.youngmoe.com/ym-r2-bucket/2023/11/8d325d458c0209b9068427474dce6377.png" width="50%">
 
+## 高级设置
+你可以通过 `TimelineExtensions/Resources/MAOTimelineExtensionsConfigSO` 自定义生成的代码路径，以及默认的命名空间。
+
+命名空间会影响在 `Timeline` 中添加 `Track` 时右键菜单的显示。当存在命名空间时，对应 Track 会生成在子菜单中，否则会生成在最外部。
+> <img src="https://r2.youngmoe.com/ym-r2-bucket/2024/11/namespace.png" width="50%">
+
 ## TODO
 - [x]  在生成时，自动获取`[Range()]`,`[Min()]`,`[Max()]`这些属性
 - [x]  优化添加属性时候的操作

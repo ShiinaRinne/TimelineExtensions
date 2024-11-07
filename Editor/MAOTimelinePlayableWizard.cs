@@ -7,8 +7,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Timeline;
 using UnityEngine.Rendering;
-using UnityEngine.Serialization;
-
+using MAOTimelineExtension.Scripts;
 
 namespace MAOTimelineExtension.Editor
 {
@@ -32,7 +31,7 @@ namespace MAOTimelineExtension.Editor
                 bool removeThis = false;
                 EditorGUILayout.BeginHorizontal();
                 name = EditorGUILayout.TextField(name);
-                m_TypeIndex = EditorGUILayout.Popup(m_TypeIndex, UsableType.GetNamewithSortingArray(usableTypes));
+                m_TypeIndex = EditorGUILayout.Popup(m_TypeIndex, UsableType.GetNameWithSortingArray(usableTypes));
                 usableType = usableTypes[m_TypeIndex];
                 if (GUILayout.Button("Remove", GUILayout.Width(60f)))
                 {
@@ -58,15 +57,7 @@ namespace MAOTimelineExtension.Editor
             }
 
             public static UsableType[] GetUsableTypesFromVariableArray(Variable[] variables)
-            {
-                UsableType[] usableTypes = new UsableType[variables.Length];
-                for (int i = 0; i < usableTypes.Length; i++)
-                {
-                    usableTypes[i] = variables[i].usableType;
-                }
-
-                return usableTypes;
-            }
+                => variables.Select(variable => variable.usableType).ToArray();
         }
         
         public class UsableType : IComparable
@@ -91,8 +82,7 @@ namespace MAOTimelineExtension.Editor
             public UsableType(Type usableType)
             {
                 type = usableType;
-
-                if (type != null)
+                if (usableType != null)
                 {
                     name = usableType.Name;
                     nameWithSorting = name.ToUpper()[0] + "/" + name;
@@ -130,73 +120,21 @@ namespace MAOTimelineExtension.Editor
 
                 return name.ToLower().CompareTo(other.name.ToLower());
             }
+            
+            public static UsableType[] GetUsableTypeArray(Type[] types, params UsableType[] additionalUsableTypes) =>
+                types.Select(type => new UsableType(type)).Concat(additionalUsableTypes).ToArray();
 
-            public static UsableType[] GetUsableTypeArray(Type[] types, params UsableType[] additionalUsableTypes)
-            {
-                List<UsableType> usableTypeList = new List<UsableType>();
-                for (int i = 0; i < types.Length; i++)
-                {
-                    usableTypeList.Add(new UsableType(types[i]));
-                }
+            public static UsableType[] AmalgamateUsableTypes(UsableType[] usableTypeArray, params UsableType[] usableTypes) =>
+                usableTypes.Concat(usableTypeArray).ToArray();
+            
+            public static string[] GetNameWithSortingArray(UsableType[] usableTypes) =>
+                usableTypes?.Select(type => type.nameWithSorting).ToArray() ?? Array.Empty<string>();
 
-                usableTypeList.AddRange(additionalUsableTypes);
-                return usableTypeList.ToArray();
-            }
-
-            public static UsableType[] AmalgamateUsableTypes(UsableType[] usableTypeArray,
-                params UsableType[] usableTypes)
-            {
-                List<UsableType> usableTypeList = new List<UsableType>();
-                for (int i = 0; i < usableTypes.Length; i++)
-                {
-                    usableTypeList.Add(usableTypes[i]);
-                }
-
-                usableTypeList.AddRange(usableTypeArray);
-                return usableTypeList.ToArray();
-            }
-
-            public static string[] GetNamewithSortingArray(UsableType[] usableTypes)
-            {
-                if (usableTypes == null || usableTypes.Length == 0)
-                    return new string[0];
-
-                string[] displayNames = new string[usableTypes.Length];
-                for (int i = 0; i < displayNames.Length; i++)
-                {
-                    displayNames[i] = usableTypes[i].nameWithSorting;
-                }
-
-                return displayNames;
-            }
-
-            public static GUIContent[] GetGUIContentWithSortingArray(UsableType[] usableTypes)
-            {
-                if (usableTypes == null || usableTypes.Length == 0)
-                    return new GUIContent[0];
-
-                GUIContent[] guiContents = new GUIContent[usableTypes.Length];
-                for (int i = 0; i < guiContents.Length; i++)
-                {
-                    guiContents[i] = usableTypes[i].guiContentWithSorting;
-                }
-
-                return guiContents;
-            }
-
-            public static string[] GetDistinctAdditionalNamespaces(UsableType[] usableTypes)
-            {
-                if (usableTypes == null || usableTypes.Length == 0)
-                    return new string[0];
-
-                string[] namespaceArray = new string[usableTypes.Length];
-                for (int i = 0; i < namespaceArray.Length; i++)
-                {
-                    namespaceArray[i] = usableTypes[i].additionalNamespace;
-                }
-
-                return namespaceArray.Distinct().ToArray();
-            }
+            public static GUIContent[] GetGUIContentWithSortingArray(UsableType[] usableTypes)=>
+                usableTypes?.Select(type => type.guiContentWithSorting).ToArray() ?? Array.Empty<GUIContent>();
+            
+            public static string[] GetDistinctAdditionalNamespaces(UsableType[] usableTypes)=>
+                usableTypes?.Select(type => type.additionalNamespace).Distinct().ToArray() ?? Array.Empty<string>();
         }
         
         public class UsableProperty : IComparable
@@ -241,53 +179,32 @@ namespace MAOTimelineExtension.Editor
 
             public int typeIndex;
 
-            public string NameWithCaptial
-            {
-                get { return name.First().ToString().ToUpper() + name.Substring(1); }
-            }
+            public string NameWithCapital => name.Title();
+            
+            public string NameAsPrivate => "m_" + NameWithCapital;
 
-            public string NameAsPrivate
-            {
-                get { return "m_" + NameWithCaptial; }
-            }
+            public string NameAsPrivateDefault => "m_Default" + NameWithCapital;
 
-            public string NameAsPrivateDefault
-            {
-                get { return "m_Default" + NameWithCaptial; }
-            }
+            public string NameAsPrivateAssigned => "m_Assigned" + NameWithCapital;
 
-            public string NameAsPrivateAssigned
-            {
-                get { return "m_Assigned" + NameWithCaptial; }
-            }
+            public string NameAsLocalBlended => "blended" + NameWithCapital;
 
-            public string NameAsLocalBlended
-            {
-                get { return "blended" + NameWithCaptial; }
-            }
-
-            public string NameAsLocalSerializedProperty
-            {
-                get { return name + "Prop"; }
-            }
+            public string NameAsLocalSerializedProperty => name + "Prop";
 
             public UsableProperty(PropertyInfo propertyInfo)
             {
                 usablePropertyType = UsablePropertyType.Property;
                 this.propertyInfo = propertyInfo;
 
-                if (propertyInfo.PropertyType.Name == "Single")
-                    type = "float";
-                else if (propertyInfo.PropertyType.Name == "Int32")
-                    type = "int";
-                else if (propertyInfo.PropertyType.Name == "Double")
-                    type = "double";
-                else if (propertyInfo.PropertyType.Name == "Boolean")
-                    type = "bool";
-                else if (propertyInfo.PropertyType.Name == "String")
-                    type = "string";
-                else
-                    type = propertyInfo.PropertyType.Name;
+                type = propertyInfo.PropertyType.Name switch
+                {
+                    "Single" => "float",
+                    "Int32"  => "int",
+                    "Double" => "double",
+                    "Boolean"=> "bool",
+                    "String" => "string",
+                    _ => propertyInfo.PropertyType.Name
+                };
 
                 name = propertyInfo.Name;
 
@@ -323,13 +240,11 @@ namespace MAOTimelineExtension.Editor
                 else if (fieldInfo.FieldType.Name == "Vector4" || fieldInfo.FieldType.Name.Contains("Vector4Parameter"))
                     type = "Vector4";
                 // TODO: Check Texture、Texture2D、Texture3D
-                else if (fieldInfo.FieldType.Name == "Texture" || fieldInfo.FieldType.Name.Contains("TextureParameter"))
+                else if (fieldInfo.FieldType.Name == "Texture"   || fieldInfo.FieldType.Name.Contains("TextureParameter"))
                     type = "Texture";
-                else if (fieldInfo.FieldType.Name == "Texture2D" ||
-                         fieldInfo.FieldType.Name.Contains("Texture2DParameter"))
+                else if (fieldInfo.FieldType.Name == "Texture2D" || fieldInfo.FieldType.Name.Contains("Texture2DParameter"))
                     type = "Texture2D";
-                else if (fieldInfo.FieldType.Name == "Texture3D" ||
-                         fieldInfo.FieldType.Name.Contains("Texture3DParameter"))
+                else if (fieldInfo.FieldType.Name == "Texture3D" || fieldInfo.FieldType.Name.Contains("Texture3DParameter"))
                     type = "Texture3D";
                 else
                     type = fieldInfo.FieldType.Name;
@@ -344,37 +259,21 @@ namespace MAOTimelineExtension.Editor
                     usability = Usability.Not;
             }
 
-            public string ZeroValueAsString()
+            public string ZeroValueAsString() => type switch
             {
-                switch (type)
-                {
-                    case "float":
-                        return "0f";
-                    case "int":
-                        return "0";
-                    case "double":
-                        return "0.0";
-                    case "Vector2":
-                        return "Vector2.zero";
-                    case "Vector3":
-                        return "Vector3.zero";
-                    case "Vector4":
-                        return "Vector4.zero";
-                    case "Color":
-                        return "Color.clear";
-                    case "bool":
-                        return "false";
-                    case "Texture":
-                        return "new Texture2D(1,1)";
-                    case "Texture2D":
-                        return "new Texture2D(1,1)";
-                    case "Texture3D":
-                        return "new Texture3D(1, 1, 1, TextureFormat.ARGB32, false)";
-                }
-
-
-                return "";
-            }
+                "float"     => "0.0f",
+                "int"       => "0",
+                "double"    => "0.0d",
+                "Vector2"   => "Vector2.zero",
+                "Vector3"   => "Vector3.zero",
+                "Vector4"   => "Vector4.zero",
+                "Color"     => "Color.clear",
+                "bool"      => "false",
+                "Texture"   => "new Texture2D(1,1)",
+                "Texture2D" => "new Texture2D(1,1)",
+                "Texture3D" => "new Texture3D(1, 1, 1, TextureFormat.ARGB32, false)",
+                _           => ""
+            };
 
             public void CreateSettingDefaultValueString(Component defaultValuesComponent)
             {
@@ -404,22 +303,19 @@ namespace MAOTimelineExtension.Editor
                         break;
                     case "Vector2":
                         Vector2 defaultVector2Value = (Vector2) defaultValueObj;
-                        defaultValue = "new Vector2(" + defaultVector2Value.x + "f, " + defaultVector2Value.y + "f)";
+                        defaultValue = $"new Vector2({defaultVector2Value.x}f, {defaultVector2Value.y}f)";
                         break;
                     case "Vector3":
                         Vector3 defaultVector3Value = (Vector3) defaultValueObj;
-                        defaultValue = "new Vector3(" + defaultVector3Value.x + "f, " + defaultVector3Value.y + "f, " +
-                                       defaultVector3Value.z + "f)";
+                        defaultValue = $"new Vector3({defaultVector3Value.x}f, {defaultVector3Value.y}f, {defaultVector3Value.z}f)";
                         break;
                     case "Vector4":
                         Vector4 defaultVector4Value = (Vector4) defaultValueObj;
-                        defaultValue = "new Vector4(" + defaultVector4Value.x + "f, " + defaultVector4Value.y + "f, " +
-                                       defaultVector4Value.z + "f)";
+                        defaultValue = $"new Vector4({defaultVector4Value.x}f, {defaultVector4Value.y}f, {defaultVector4Value.z}f)";
                         break;
                     case "Color":
                         Color defaultColorValue = (Color) defaultValueObj;
-                        defaultValue = "new Color(" + defaultColorValue.r + "f, " + defaultColorValue.g + "f, " +
-                                       defaultColorValue.b + "f, " + defaultColorValue.a + "f)";
+                        defaultValue = $"new Color({defaultColorValue.r}f, {defaultColorValue.g}f, {defaultColorValue.b}f, {defaultColorValue.a}f)";
                         break;
                     case "string":
                         defaultValue = "\"" + defaultValueObj + "\"";
@@ -435,7 +331,7 @@ namespace MAOTimelineExtension.Editor
                         Enum defaultEnumValue = (Enum) defaultValueObj;
                         Type enumSystemType = defaultEnumValue.GetType();
                         string[] splits = enumSystemType.ToString().Split('+');
-                        string enumType = splits[splits.Length - 1];
+                        string enumType = splits[^1];
                         string enumConstantName = Enum.GetName(enumSystemType, defaultEnumValue);
                         defaultValue = enumType + "." + enumConstantName;
                         break;
@@ -468,7 +364,7 @@ namespace MAOTimelineExtension.Editor
                 }
                 else if (typeName.Contains("ColorParameter"))
                 {
-                    if((parameter as ColorParameter).hdr 
+                    if((parameter as ColorParameter).hdr
                        // && (parameter as ColorParameter).showAlpha // 不管这个，都显示
                        )
                         propertyAttributesType = PropertyAttributesType.ColorHDR;
@@ -476,15 +372,11 @@ namespace MAOTimelineExtension.Editor
             }
             
             public object GetPropertyAttributesMax(object parameter)
-            {
-                return parameter.GetType().GetField("max").GetValue(parameter);
-            }
+                => parameter.GetType().GetField("max").GetValue(parameter);
+            
             public object GetPropertyAttributesMin(object parameter)
-            {
-                return parameter.GetType().GetField("min").GetValue(parameter);
-            }
-
-
+                => parameter.GetType().GetField("min").GetValue(parameter);
+            
             public void CreateSettingDefaultValueStringVolume<T>(Volume defaultValuesComponent, UsableProperty prop)
                 where T : VolumeComponent
             {
@@ -501,51 +393,43 @@ namespace MAOTimelineExtension.Editor
 
                 
                 var method = typeof(VolumeParameter).GetMethod("GetValue");
+                if(method is null) return;
+                
                 switch (prop.type)
                 {
                     case "float":
-                        float defaultFloatValue =
-                            (float) method.MakeGenericMethod(typeof(float)).Invoke(parameter, null);
+                        var defaultFloatValue = (float) method.MakeGenericMethod(typeof(float)).Invoke(parameter, null);
                         defaultValue = defaultFloatValue + "f";
                         break;
                     case "int":
-                        int defaultIntValue = (int) method.MakeGenericMethod(typeof(int)).Invoke(parameter, null);
+                        var defaultIntValue = (int) method.MakeGenericMethod(typeof(int)).Invoke(parameter, null);
                         defaultValue = defaultIntValue.ToString();
                         break;
                     case "double":
-                        double defaultDoubleValue =
-                            (double) method.MakeGenericMethod(typeof(double)).Invoke(parameter, null);
+                        var defaultDoubleValue = (double) method.MakeGenericMethod(typeof(double)).Invoke(parameter, null);
                         defaultValue = defaultDoubleValue.ToString();
                         break;
                     case "Vector2":
-                        Vector2 defaultVector2Value =
-                            (Vector2) method.MakeGenericMethod(typeof(Vector2)).Invoke(parameter, null);
-                        defaultValue = "new Vector2(" + defaultVector2Value.x + "f, " + defaultVector2Value.y + "f)";
+                        var defaultVector2Value = (Vector2) method.MakeGenericMethod(typeof(Vector2)).Invoke(parameter, null);
+                        defaultValue = $"new Vector2({defaultVector2Value.x}f, {defaultVector2Value.y}f)";
                         break;
                     case "Vector3":
-                        Vector3 defaultVector3Value =
-                            (Vector3) method.MakeGenericMethod(typeof(Vector3)).Invoke(parameter, null);
-                        defaultValue = "new Vector3(" + defaultVector3Value.x + "f, " + defaultVector3Value.y + "f, " +
-                                       defaultVector3Value.z + "f)";
+                        var defaultVector3Value = (Vector3) method.MakeGenericMethod(typeof(Vector3)).Invoke(parameter, null);
+                        defaultValue = $"new Vector3({defaultVector3Value.x}f, {defaultVector3Value.y}f, {defaultVector3Value.z}f)";
                         break;
                     case "Vector4":
-                        Vector4 defaultVector4Value =
-                            (Vector4) method.MakeGenericMethod(typeof(Vector4)).Invoke(parameter, null);
-                        defaultValue = "new Vector4(" + defaultVector4Value.x + "f, " + defaultVector4Value.y + "f, " +
-                                       defaultVector4Value.z + "f)";
+                        var defaultVector4Value = (Vector4) method.MakeGenericMethod(typeof(Vector4)).Invoke(parameter, null);
+                        defaultValue = $"new Vector4({defaultVector4Value.x}f, {defaultVector4Value.y}f, {defaultVector4Value.z}f)";
                         break;
                     case "Color":
-                        Color defaultColorValue =
-                            (Color) method.MakeGenericMethod(typeof(Color)).Invoke(parameter, null);
-                        defaultValue = "new Color(" + defaultColorValue.r + "f, " + defaultColorValue.g + "f, " +
-                                       defaultColorValue.b + "f, " + defaultColorValue.a + "f)";
+                        var defaultColorValue = (Color) method.MakeGenericMethod(typeof(Color)).Invoke(parameter, null);
+                        defaultValue = $"new Color({defaultColorValue.r}f, {defaultColorValue.g}f, {defaultColorValue.b}f, {defaultColorValue.a}f)";
                         break;
                     case "string":
-                        defaultValue = "\"" +
-                                       (string) method.MakeGenericMethod(typeof(string)).Invoke(parameter, null) + "\"";
+                        defaultValue = "\"" + (string) method.MakeGenericMethod(typeof(string)).Invoke(parameter, null) + "\"";
                         break;
                     case "bool":
-                        bool defaultBoolValue = (bool) method.MakeGenericMethod(typeof(bool)).Invoke(parameter, null);
+                        var defaultBoolValue = (bool) method.MakeGenericMethod(typeof(bool)).Invoke(parameter, null);
                         defaultValue = defaultBoolValue.ToString().ToLower();
                         break;
                     case "Texture":
@@ -555,7 +439,7 @@ namespace MAOTimelineExtension.Editor
                         Enum defaultEnumValue = (Enum) method.MakeGenericMethod(typeof(Enum)).Invoke(parameter, null);
                         Type enumSystemType = defaultEnumValue.GetType();
                         string[] splits = enumSystemType.ToString().Split('+');
-                        string enumType = splits[splits.Length - 1];
+                        string enumType = splits[^1];
                         string enumConstantName = Enum.GetName(enumSystemType, defaultEnumValue);
                         defaultValue = enumType + "." + enumConstantName;
                         break;
@@ -563,7 +447,7 @@ namespace MAOTimelineExtension.Editor
                 
                 try
                 {
-                    typeof(UsableProperty).GetMethod("GetPropertyAttributes")
+                    typeof(UsableProperty).GetMethod("GetPropertyAttributes")?
                         .MakeGenericMethod(parameter.GetType()).Invoke(prop, new object[] {parameter});
                 }catch (Exception e)
                 {
@@ -571,7 +455,7 @@ namespace MAOTimelineExtension.Editor
                 }
             }
 
-            public bool GUI(List<UsableProperty> allUsableProperties)
+            public bool ShowGUI(List<UsableProperty> allUsableProperties)
             {
                 bool removeThis = false;
                 EditorGUILayout.BeginHorizontal();
@@ -584,7 +468,13 @@ namespace MAOTimelineExtension.Editor
                 propertyInfo = allUsableProperties[typeIndex].propertyInfo;
                 fieldInfo = allUsableProperties[typeIndex].fieldInfo;
                 usability = allUsableProperties[typeIndex].usability;
-                GUILayout.Label(allUsableProperties[typeIndex].type, GUILayout.Width(150f));
+                
+                bool isTypeSupported = usability != Usability.Not;
+                Color originalColor = GUI.color;
+                if (!isTypeSupported) GUI.color = Color.red;
+                GUILayout.Label(type, GUILayout.Width(150f)); // unsupported types are red
+                GUI.color = originalColor;
+                
                 if (GUILayout.Button("Remove", GUILayout.Width(60f)))
                 {
                     removeThis = true;
@@ -607,17 +497,9 @@ namespace MAOTimelineExtension.Editor
                 return name.ToLower().CompareTo(other.name.ToLower());
             }
 
-            public static string[] GetNameWithSortingArray(List<UsableProperty> usableProperties)
-            {
-                string[] returnVal = new string[usableProperties.Count];
-                for (int i = 0; i < returnVal.Length; i++)
-                {
-                    returnVal[i] = usableProperties[i].name;
-                }
-
-                return returnVal;
-            }
-
+            static string[] GetNameWithSortingArray(List<UsableProperty> usableProperties)
+                => usableProperties.Select(property => property.name).ToArray();
+            
             public UsableProperty GetDuplicate()
             {
                 UsableProperty duplicate = usablePropertyType == UsablePropertyType.Property
@@ -645,31 +527,29 @@ namespace MAOTimelineExtension.Editor
             VolumeComponent
         }
 
-        private static MAOTimelineExtensionsConfigSO config;
-        public static MAOTimelineExtensionsConfigSO Config
+        private static MAOTimelineExtensionsConfigSO _config;
+        private static MAOTimelineExtensionsConfigSO Config
         {
             get
             {
-                if (config == null)
+                if (_config == null)
                 {
-                    config = Resources.Load<MAOTimelineExtensionsConfigSO>("MAOTimelineExtensionsConfigSO");
-                    if (config == null)
+                    _config = Resources.Load<MAOTimelineExtensionsConfigSO>("MAOTimelineExtensionsConfigSO");
+                    if (_config == null)
                     {
                         Debug.LogError("Cannot find MAOTimelineExtensionsConfigSO in Resources folder!");
                     }
                 }
-                return config;
+                return _config;
             }
         }
-        
-        // string m_RootFolderPath = "Assets/TimelineExtensions";
 
         public bool showHelpBoxes = true;
         public string playableName = "";
 
         public WorkType workType = WorkType.Component;
 
-        public static UsableType trackBinding;
+        public static UsableType TrackBinding;
         public Component defaultValuesComponent;
         // public VolumeComponent defaultValuesVolumeComponent;
         public Volume defaultValuesVolume;
@@ -762,10 +642,10 @@ namespace MAOTimelineExtension.Editor
         const string k_PlayableBehaviourMixerSuffix = "MixerBehaviour";
         const string k_TrackAssetSuffix = "Track";
         const string k_PropertyDrawerSuffix = "Drawer";
-        const int k_PlayableNameCharLimit = 64;
-        const float k_WindowWidth = 500f;
-        const float k_MaxWindowHeight = 800f;
-        const float k_ScreenSizeWindowBuffer = 100f;
+        const int    k_PlayableNameCharLimit = 64;
+        const float  k_WindowWidth = 500f;
+        const float  k_MaxWindowHeight = 800f;
+        const float  k_ScreenSizeWindowBuffer = 100f;
 
         static UsableType[] s_ComponentTypes;
 
@@ -784,26 +664,27 @@ namespace MAOTimelineExtension.Editor
 
         static Type[] s_AssignableTypes =
         {
-            typeof(string), typeof(bool)
+            typeof(string), typeof(bool), 
+            typeof(BoolParameter), typeof(TextureParameter)
         };
 
-        static string[] s_DisallowedPropertyNames =
-        {
-            "name",
-        };
+        static string[] s_DisallowedPropertyNames = { "name" };
 
         [MenuItem("Window/MAO Timeline Playable Wizard")]
         static void CreateWindow()
         {
-            MaoTimelinePlayableWizard wizard =
-                GetWindow<MaoTimelinePlayableWizard>(true, "MAO Timeline Playable Wizard", true);
+            MaoTimelinePlayableWizard wizard = GetWindow<MaoTimelinePlayableWizard>(true, "MAO Timeline Playable Wizard", true);
 
             Vector2 position = Vector2.zero;
             SceneView sceneView = SceneView.lastActiveSceneView;
             if (sceneView != null)
                 position = new Vector2(sceneView.position.x, sceneView.position.y);
-            wizard.position = new Rect(position.x + k_ScreenSizeWindowBuffer, position.y + k_ScreenSizeWindowBuffer,
-                k_WindowWidth, Mathf.Min(Screen.currentResolution.height - k_ScreenSizeWindowBuffer, k_MaxWindowHeight));
+            
+            wizard.position = new Rect(
+                position.x + k_ScreenSizeWindowBuffer, 
+                position.y + k_ScreenSizeWindowBuffer,
+                k_WindowWidth, 
+                Mathf.Min(Screen.currentResolution.height - k_ScreenSizeWindowBuffer, k_MaxWindowHeight));
 
             wizard.showHelpBoxes = EditorPrefs.GetBool(k_ShowHelpBoxesKey);
             wizard.Show();
@@ -887,8 +768,7 @@ namespace MAOTimelineExtension.Editor
             // Track binding type
             GUITrackBindingTypePart(out int oldIndex, out bool defaultValuesNotExist);
             
-
-
+            
             // Property
             GUIPropertyPart(oldIndex, oldWorkType);
 
@@ -995,23 +875,22 @@ namespace MAOTimelineExtension.Editor
             {
                 m_ComponentBindingTypeIndex = EditorGUILayout.Popup(m_TrackBindingTypeContent,
                     m_ComponentBindingTypeIndex, UsableType.GetGUIContentWithSortingArray(s_ComponentTypes));
-                trackBinding = s_ComponentTypes[m_ComponentBindingTypeIndex];
+                TrackBinding = s_ComponentTypes[m_ComponentBindingTypeIndex];
 
                 EditorGUILayout.Space();
 
                 defaultValuesComponent = EditorGUILayout.ObjectField(m_DefaultValuesComponentContent,
-                        defaultValuesComponent, trackBinding.type, true)
+                        defaultValuesComponent, TrackBinding.type, true)
                     as Component;
             }
             else if (workType == WorkType.VolumeComponent)
             {
                 m_ComponentBindingTypeIndex = EditorGUILayout.Popup(m_TrackBindingTypeContent,
                     m_ComponentBindingTypeIndex, UsableType.GetGUIContentWithSortingArray(s_VolumeComponentTypes));
-                trackBinding = s_VolumeComponentTypes[m_ComponentBindingTypeIndex];
+                TrackBinding = s_VolumeComponentTypes[m_ComponentBindingTypeIndex];
 
                 EditorGUILayout.Space();
 
-                // TODO: Automatically obtain the Global Volume in the scenario where the user is creating a Volume Component
                 defaultValuesVolume = EditorGUILayout.ObjectField(m_DefaultValuesComponentContent, defaultValuesVolume,
                     typeof(Volume), true) as Volume;
                 
@@ -1019,6 +898,13 @@ namespace MAOTimelineExtension.Editor
                 if (defaultValuesNotExist)
                 {
                     EditorGUILayout.HelpBox("A Volume component is required as the default values source", MessageType.Error);
+                }
+                else
+                {
+                    if (defaultValuesVolume?.gameObject.GetComponent<MAOTimelineExtensionVolumeSettings>() is null)
+                    {
+                        defaultValuesVolume?.gameObject.AddComponent<MAOTimelineExtensionVolumeSettings>();
+                    }
                 }
             }
 
@@ -1029,13 +915,11 @@ namespace MAOTimelineExtension.Editor
         {
             if (workType == WorkType.Component)
             {
-                StandardBlendPlayablePropertyGUI(oldIndex != m_ComponentBindingTypeIndex ||
-                                                 oldWorkType != WorkType.Component);
+                StandardBlendPlayablePropertyGUI(oldIndex != m_ComponentBindingTypeIndex || oldWorkType != WorkType.Component);
             }
             else
             {
-                VolumeComponentPropertyGUI(oldIndex != m_ComponentBindingTypeIndex ||
-                                           oldWorkType != WorkType.VolumeComponent);
+                VolumeComponentPropertyGUI(oldIndex != m_ComponentBindingTypeIndex || oldWorkType != WorkType.VolumeComponent);
             }
 
             EditorGUILayout.Space();
@@ -1072,8 +956,8 @@ namespace MAOTimelineExtension.Editor
                     }
                     else if (workType == WorkType.VolumeComponent)
                     {
-                        var genericMethod = typeof(UsableProperty).GetMethod("CreateSettingDefaultValueStringVolume")?
-                            .MakeGenericMethod(trackBinding.type);
+                        var genericMethod = typeof(UsableProperty).GetMethod("CreateSettingDefaultValueStringVolume")
+                            ?.MakeGenericMethod(TrackBinding.type);
 
                         foreach (var prop in postProcessVolumeProperties)
                         {
@@ -1148,12 +1032,11 @@ namespace MAOTimelineExtension.Editor
             {
                 m_TrackBindingUsableProperties.Clear();
 
-                IEnumerable<PropertyInfo> propertyInfos = trackBinding.type.GetProperties(
+                IEnumerable<PropertyInfo> propertyInfos = TrackBinding.type.GetProperties(
                     BindingFlags.Instance | BindingFlags.Public | BindingFlags.SetProperty | BindingFlags.GetProperty);
-                propertyInfos =
-                    propertyInfos.Where(x => IsTypeBlendable(x.PropertyType) || IsTypeAssignable(x.PropertyType));
-                propertyInfos = propertyInfos.Where(x => x.CanWrite && x.CanRead);
-                propertyInfos = propertyInfos.Where(x => HasAllowedName(x));
+                propertyInfos = propertyInfos.Where(x => IsTypeBlendable(x.PropertyType) || IsTypeAssignable(x.PropertyType))
+                    .Where(x => x.CanWrite && x.CanRead)
+                    .Where(x => HasAllowedName(x));
                 // Uncomment the below to stop Obsolete properties being selectable.
                 //propertyInfos = propertyInfos.Where (x => !Attribute.IsDefined (x, typeof(ObsoleteAttribute)));
                 m_TrackBindingProperties = propertyInfos.ToArray();
@@ -1162,8 +1045,7 @@ namespace MAOTimelineExtension.Editor
                     m_TrackBindingUsableProperties.Add(new UsableProperty(trackBindingProperty));
                 }
 
-                IEnumerable<FieldInfo> fieldInfos =
-                    trackBinding.type.GetFields(BindingFlags.Instance | BindingFlags.Public);
+                IEnumerable<FieldInfo> fieldInfos = TrackBinding.type.GetFields(BindingFlags.Instance | BindingFlags.Public);
                 fieldInfos = fieldInfos.Where(x => IsTypeBlendable(x.FieldType) || IsTypeAssignable(x.FieldType));
                 m_TrackBindingFields = fieldInfos.ToArray();
                 foreach (FieldInfo trackBindingField in m_TrackBindingFields)
@@ -1181,21 +1063,21 @@ namespace MAOTimelineExtension.Editor
 
             EditorGUILayout.LabelField(m_StandardBlendPlayablePropertiesContent);
 
+            if (GUILayout.Button("Add", GUILayout.Width(40f)))
+            {
+                standardBlendPlayableProperties.Add(m_TrackBindingUsableProperties[0].GetDuplicate());
+            }
+            
             int indexToRemove = -1;
             for (int i = 0; i < standardBlendPlayableProperties.Count; i++)
             {
-                if (standardBlendPlayableProperties[i].GUI(m_TrackBindingUsableProperties))
+                if (standardBlendPlayableProperties[i].ShowGUI(m_TrackBindingUsableProperties))
                     indexToRemove = i;
             }
 
             if (indexToRemove != -1)
                 standardBlendPlayableProperties.RemoveAt(indexToRemove);
-
-            if (GUILayout.Button("Add", GUILayout.Width(40f)))
-            {
-                standardBlendPlayableProperties.Add(m_TrackBindingUsableProperties[0].GetDuplicate());
-            }
-
+            
             if (standardBlendPlayableProperties.Any(IsObsolete))
                 EditorGUILayout.HelpBox(
                     "One or more of your chosen properties are marked 'Obsolete'.  Consider changing them to avoid deprecation with future versions of Unity.",
@@ -1210,12 +1092,12 @@ namespace MAOTimelineExtension.Editor
             {
                 m_TrackBindingUsableProperties.Clear();
 
-                IEnumerable<PropertyInfo> propertyInfos = trackBinding.type.GetProperties();
+                IEnumerable<PropertyInfo> propertyInfos = TrackBinding.type.GetProperties();
                 propertyInfos = propertyInfos.Where(x => x.Name == "parameters");
 
                 m_TrackBindingProperties = propertyInfos.ToArray();
 
-                IEnumerable<FieldInfo> fieldInfos = trackBinding.type.GetFields();
+                IEnumerable<FieldInfo> fieldInfos = TrackBinding.type.GetFields();
 
                 m_TrackBindingFields = fieldInfos.ToArray();
                 foreach (FieldInfo trackBindingField in m_TrackBindingFields)
@@ -1240,82 +1122,81 @@ namespace MAOTimelineExtension.Editor
 
             EditorGUILayout.LabelField(m_PostProcessVolumePropertiesContent);
 
-            int indexToRemove = -1;
-            for (int i = 0; i < postProcessVolumeProperties.Count; i++)
-            {
-                if (postProcessVolumeProperties[i].GUI(m_TrackBindingUsableProperties))
-                    indexToRemove = i;
-            }
-
-            if (indexToRemove != -1)
-                postProcessVolumeProperties.RemoveAt(indexToRemove);
-
             var availableProperties = m_TrackBindingUsableProperties
                 .Where(property => !postProcessVolumeProperties.Any(p => p.name == property.name))
                 .ToList();
             
             if (availableProperties.Count > 0)
             {
-                if (GUILayout.Button("Add", GUILayout.Width(40f)))
+                EditorGUILayout.BeginHorizontal();
+                if (GUILayout.Button("Add", GUILayout.Width(60f)))
                 {
-                    var dup = availableProperties[0].GetDuplicate();
-                    dup.typeIndex = m_TrackBindingUsableProperties.FindIndex(p => p.name == dup.name);;
-                    postProcessVolumeProperties.Add(dup);
+                    var property = availableProperties[0];
+                    postProcessVolumeProperties.Add(CreateDuplicateProperty(property));
                 }
+        
+                if (GUILayout.Button("Add All", GUILayout.Width(60f)))
+                {
+                    postProcessVolumeProperties.AddRange(availableProperties.Select(CreateDuplicateProperty));
+                }
+                
+                if(GUILayout.Button("Clear", GUILayout.Width(60f)))
+                {
+                    postProcessVolumeProperties.Clear();
+                }
+                EditorGUILayout.EndHorizontal();
             }
             else
             {
-                EditorGUILayout.HelpBox(
-                    "No more properties to add",
-                    MessageType.Info);
+                EditorGUILayout.HelpBox("You have added all properties.", MessageType.Info);
+                
+                if(GUILayout.Button("Clear", GUILayout.Width(60f)))
+                {
+                    postProcessVolumeProperties.Clear();
+                }
             }
+            if(postProcessVolumeProperties.Any(prop => prop.usability == UsableProperty.Usability.Not))
+                EditorGUILayout.HelpBox("One or more of your chosen properties are not supported, which may cause errors, " +
+                                        "or you should modify the generated code to make it work.", MessageType.Warning);
+            
+            int indexToRemove = -1;
+            for (int i = 0; i < postProcessVolumeProperties.Count; i++)
+            {
+                if (postProcessVolumeProperties[i].ShowGUI(m_TrackBindingUsableProperties))
+                    indexToRemove = i;
+            }
+
+            if (indexToRemove != -1)
+                postProcessVolumeProperties.RemoveAt(indexToRemove);
             
             if (postProcessVolumeProperties.Any(IsObsolete))
                 EditorGUILayout.HelpBox(
                     "One or more of your chosen properties are marked 'Obsolete'.  Consider changing them to avoid deprecation with future versions of Unity.",
                     MessageType.Warning);
 
-            var q = postProcessVolumeProperties.GroupBy(x => x.name).Where(g => g.Count() > 1)
-                .Select(y => y.Key).ToList();
+            var q = postProcessVolumeProperties.GroupBy(x => x.name)
+                .Where(g => g.Count() > 1).Select(y => y.Key).ToList();
             if (q.Count > 0)
                 EditorGUILayout.HelpBox("Cannot have the same attribute", MessageType.Error);
-
-
+            
             EditorGUILayout.EndVertical();
         }
 
-        static bool IsTypeBlendable(Type type)
+        private UsableProperty CreateDuplicateProperty(UsableProperty property)
         {
-            for (int i = 0; i < s_BlendableTypes.Length; i++)
-            {
-                if (type == s_BlendableTypes[i] || type.BaseType == s_BlendableTypes[i])
-                    return true;
-            }
-
-            return false;
+            var dup = property.GetDuplicate();
+            dup.typeIndex = m_TrackBindingUsableProperties.FindIndex(p => p.name == dup.name);
+            return dup;
         }
+        
+        static bool IsTypeBlendable(Type type) 
+            => s_BlendableTypes.Any(blendableType => type == blendableType || type.BaseType == blendableType);
 
-        static bool IsTypeAssignable(Type type)
-        {
-            for (int i = 0; i < s_AssignableTypes.Length; i++)
-            {
-                if (type == s_AssignableTypes[i] || type.IsEnum)
-                    return true;
-            }
-
-            return false;
-        }
+        static bool IsTypeAssignable(Type type) 
+            => type.IsEnum || s_AssignableTypes.Contains(type);
 
         static bool HasAllowedName(PropertyInfo propertyInfo)
-        {
-            for (int i = 0; i < s_DisallowedPropertyNames.Length; i++)
-            {
-                if (propertyInfo.Name == s_DisallowedPropertyNames[i])
-                    return false;
-            }
-
-            return true;
-        }
+            => !s_DisallowedPropertyNames.Contains(propertyInfo.Name);
 
         static bool IsObsolete(UsableProperty usableProperty)
         {
@@ -1501,7 +1382,7 @@ namespace MAOTimelineExtension.Editor
         {
             playableName = "";
             workType = WorkType.Component;
-            trackBinding = s_TrackBindingTypes[0];
+            TrackBinding = s_TrackBindingTypes[0];
             defaultValuesComponent = null;
             defaultValuesVolume = null;
             // defaultValuesVolumeComponent = null;

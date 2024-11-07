@@ -102,6 +102,12 @@ You can find it in `Assets/TimelineExtensions`
 > <img src="https://r2.youngmoe.com/ym-r2-bucket/2023/11/48d3bda1b26b762ac0477f2b94fc2a75.png" width="50%">
 > <img src="https://r2.youngmoe.com/ym-r2-bucket/2023/11/8d325d458c0209b9068427474dce6377.png" width="50%">
 
+## Advanced Settings
+You can customize the generated code path and default namespace through `TimelineExtensions/Resources/MAOTimelineExtensionsConfigSO`.
+
+The namespace affects how the Track appears in the context menu when adding a Track in Timeline. When a namespace is present, the corresponding Track will be generated in a submenu; otherwise, it will appear in the root menu.
+
+> <img src="https://r2.youngmoe.com/ym-r2-bucket/2024/11/namespace.png" width="50%">
 
 
 ## TODO

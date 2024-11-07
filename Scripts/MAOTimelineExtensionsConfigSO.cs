@@ -6,7 +6,7 @@ namespace MAOTimelineExtension
     [CreateAssetMenu(fileName = "MAOTimelineExtensionsConfigSO", menuName = "MAOTimelineExtensions/ConfigSO", order = 0)]
     public class MAOTimelineExtensionsConfigSO : ScriptableObject
     {
-        [FormerlySerializedAs("SavePath")] public string RootFolderPath = "Assets/TimelineExtensions";
-        public string DefaultNameSpace = "MAOTimelineExtension.VolumeExtensions";
+        public string rootFolderPath = "Assets/TimelineExtensions";
+        public string defaultNameSpace = "MAOTimelineExtension.VolumeExtensions";
     }
 }

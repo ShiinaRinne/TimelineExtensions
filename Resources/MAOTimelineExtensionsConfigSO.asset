@@ -9,8 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3e3682a4431449a28c152afdc74e070f, type: 3}
+  m_Script: {fileID: 11500000, guid: f7bd84cfcc3744247b7b235f4cf3b61a, type: 3}
   m_Name: MAOTimelineExtensionsConfigSO
   m_EditorClassIdentifier: 
-  RootFolderPath: Assets/MAOTimelineExtensions
-  DefaultNameSpace: SRTimelineExtension.VolumeExtensions
+  rootFolderPath: Assets/TimelineExtensions
+  defaultNameSpace: WithNameSpace

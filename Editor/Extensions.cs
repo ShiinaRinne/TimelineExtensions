@@ -4,7 +4,7 @@ using UnityEngine.Rendering;
 
 namespace MAOTimelineExtension.Scripts
 {
-    public static class YMExtensions
+    public static class MAOExtensions
     {
         /// Return a titlecased version of the string
         /// Examples: "elysia".Title() => "Elysia"
